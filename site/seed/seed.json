@@ -29,19 +29,22 @@
 					"label": "Title",
 					"type": "string",
 					"required": true,
-					"searchable": true
+					"searchable": true,
+					"translatable": true
 				},
 				{
 					"slug": "summary",
 					"label": "Summary",
 					"type": "text",
-					"searchable": true
+					"searchable": true,
+					"translatable": true
 				},
 				{
 					"slug": "content",
 					"label": "Content",
 					"type": "portableText",
-					"searchable": true
+					"searchable": true,
+					"translatable": true
 				},
 				{
 					"slug": "placeholder",
@@ -71,29 +74,34 @@
 					"label": "Title",
 					"type": "string",
 					"required": true,
-					"searchable": true
+					"searchable": true,
+					"translatable": true
 				},
 				{
 					"slug": "excerpt",
 					"label": "Excerpt",
 					"type": "text",
-					"searchable": true
+					"searchable": true,
+					"translatable": true
 				},
 				{
 					"slug": "featured_image",
 					"label": "Cover image",
-					"type": "image"
+					"type": "image",
+					"translatable": true
 				},
 				{
 					"slug": "content",
 					"label": "Content",
 					"type": "portableText",
-					"searchable": true
+					"searchable": true,
+					"translatable": true
 				},
 				{
 					"slug": "angle",
 					"label": "Angle (editors only: the one point this post makes)",
-					"type": "string"
+					"type": "string",
+					"translatable": true
 				}
 			]
 		}
