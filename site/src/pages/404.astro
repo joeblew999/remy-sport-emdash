@@ -1,33 +1,20 @@
 ---
+// Every address with nothing behind it, in either language. Never cached, never indexed.
 import Base from "../layouts/Base.astro";
+import { t } from "../i18n/ui";
+import { loadShell, localeOf, localePath } from "../lib/site";
+
+const locale = localeOf(Astro);
+Astro.response.status = 404;
+const shell = await loadShell(Astro, { cacheable: false });
 ---
 
-<Base title="Page not found">
-	<div class="not-found">
-		<h1>404</h1>
-		<p>The page you're looking for doesn't exist.</p>
-		<a href="/">Go back home</a>
+<Base title={t(locale, "notFoundTitle")} noindex shell={shell}>
+	<div class="narrow page-head">
+		<h1>{t(locale, "notFoundTitle")}</h1>
+		<p class="lead">{t(locale, "notFoundBody")}</p>
+		<div class="cta-row">
+			<a class="btn" href={localePath("/", locale)}>{t(locale, "goHome")}</a>
+		</div>
 	</div>
 </Base>
-
-<style>
-	.not-found {
-		text-align: center;
-		padding: var(--spacing-24) var(--spacing-6);
-	}
-
-	.not-found h1 {
-		font-size: var(--font-size-5xl);
-		margin-bottom: var(--spacing-2);
-		color: var(--color-border);
-	}
-
-	.not-found p {
-		color: var(--color-muted);
-		margin-bottom: var(--spacing-6);
-	}
-
-	.not-found a {
-		color: var(--color-text);
-	}
-</style>

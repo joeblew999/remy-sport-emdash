@@ -1,0 +1,29 @@
+---
+// The Thai address of ../../blog/[slug].astro — the same code; the language comes from the URL.
+// "/blog/<slug>" — one post.
+import Base from "../../../layouts/Base.astro";
+import { loadEntry, loadShell, slugParam } from "../../../lib/site";
+import PostView from "../../../views/PostView.astro";
+
+const slug = slugParam(Astro);
+if (!slug) return Astro.rewrite("/404");
+
+const found = await loadEntry(Astro, "posts", slug);
+if (!found) return Astro.rewrite("/404");
+const { entry: post, isFallback } = found;
+const shell = await loadShell(Astro);
+---
+
+<Base
+	shell={shell}
+	title={post.data.title}
+	description={post.data.excerpt}
+	image={post.data.featured_image?.src}
+	type="article"
+	publishedTime={post.data.publishedAt?.toISOString()}
+	modifiedTime={post.data.updatedAt?.toISOString()}
+	content={{ collection: "posts", id: post.data.id, slug: post.id }}
+	isFallback={isFallback}
+>
+	<PostView post={post} />
+</Base>

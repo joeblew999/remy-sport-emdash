@@ -1,8 +1,8 @@
 ---
-// "/" — the landing page. The words are the `home` page entry; see views/HomeView.astro.
-import Base from "../layouts/Base.astro";
-import { loadHome, loadShell } from "../lib/site";
-import HomeView from "../views/HomeView.astro";
+// "/th/" — the same route as ../index.astro. The language comes from the URL (Astro.currentLocale).
+import Base from "../../layouts/Base.astro";
+import { loadHome, loadShell } from "../../lib/site";
+import HomeView from "../../views/HomeView.astro";
 
 const data = await loadHome(Astro);
 if (!data) return Astro.rewrite("/404");

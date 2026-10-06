@@ -1,0 +1,112 @@
+---
+import type { ContentEntry, InferCollectionData, TaxonomyTerm } from "emdash";
+import PostCard from "../components/PostCard.astro";
+import { t } from "../i18n/ui";
+import { localeOf, localePath } from "../lib/site";
+
+interface Props {
+	posts: ContentEntry<InferCollectionData<"posts">>[];
+	audiences: TaxonomyTerm[];
+	topics: TaxonomyTerm[];
+	active: { audience?: string; topic?: string };
+}
+
+const { posts, audiences, topics, active } = Astro.props;
+const locale = localeOf(Astro);
+const base = localePath("/blog", locale);
+const isFiltered = Boolean(active.audience || active.topic);
+---
+
+<div class="wrap">
+	<header class="page-head">
+		<h1>{t(locale, "blogTitle")}</h1>
+		<p class="lead">{t(locale, "blogDescription")}</p>
+	</header>
+
+	<nav class="filters" aria-label={t(locale, "blogTitle")}>
+		<a href={base} aria-current={isFiltered ? undefined : "page"}>{t(locale, "filterAll")}</a>
+		{
+			audiences.length > 0 && (
+				<span class="group">
+					<span class="group-label">{t(locale, "filterAudience")}</span>
+					{audiences.map((term) => (
+						<a
+							href={`${base}?audience=${encodeURIComponent(term.slug)}`}
+							aria-current={active.audience === term.slug ? "page" : undefined}
+						>
+							{term.label}
+						</a>
+					))}
+				</span>
+			)
+		}
+		{
+			topics.length > 0 && (
+				<span class="group">
+					<span class="group-label">{t(locale, "filterTopic")}</span>
+					{topics.map((term) => (
+						<a
+							href={`${base}?topic=${encodeURIComponent(term.slug)}`}
+							aria-current={active.topic === term.slug ? "page" : undefined}
+						>
+							{term.label}
+						</a>
+					))}
+				</span>
+			)
+		}
+	</nav>
+
+	{
+		posts.length === 0 ? (
+			<p class="empty">{t(locale, "noPosts")}</p>
+		) : (
+			<ul class="cards">
+				{posts.map((post) => (
+					<li>
+						<PostCard post={post} heading="h2" />
+					</li>
+				))}
+			</ul>
+		)
+	}
+</div>
+
+<style>
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-2) var(--spacing-6);
+		margin-bottom: var(--spacing-8);
+		font-size: var(--font-size-sm);
+	}
+
+	.group {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-2) var(--spacing-3);
+	}
+
+	.group-label {
+		color: var(--color-muted);
+	}
+
+	.filters a {
+		color: var(--color-text-secondary);
+	}
+
+	.filters a[aria-current="page"] {
+		color: var(--color-text);
+		font-weight: 600;
+		text-decoration: underline;
+	}
+
+	.empty {
+		color: var(--color-muted);
+	}
+
+	.cards :global(h2) {
+		font-size: var(--font-size-xl);
+		margin-bottom: var(--spacing-2);
+	}
+</style>

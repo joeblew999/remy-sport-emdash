@@ -1,0 +1,44 @@
+---
+// An editor-written page: organisers, coaches, parents, about, privacy, terms.
+import type { ContentEntry, InferCollectionData } from "emdash";
+import { PortableText } from "emdash/ui";
+import { t } from "../i18n/ui";
+import { appHref } from "../lib/app";
+import { localeOf } from "../lib/site";
+
+interface Props {
+	page: ContentEntry<InferCollectionData<"pages">>;
+}
+
+const { page } = Astro.props;
+const locale = localeOf(Astro);
+---
+
+<article class="narrow">
+	<header class="page-head">
+		<h1 {...page.edit.title}>{page.data.title}</h1>
+		{page.data.summary && <p class="lead" {...page.edit.summary}>{page.data.summary}</p>}
+	</header>
+
+	{page.data.placeholder && <p class="placeholder-banner">{t(locale, "placeholder")}</p>}
+
+	<div class="prose body" {...page.edit.content}>
+		<PortableText value={page.data.content} />
+	</div>
+
+	{
+		!page.data.placeholder && (
+			<div class="cta-row">
+				<a class="btn btn-primary" href={appHref({ page: "home" }, page.id)}>
+					{t(locale, "openApp")}
+				</a>
+			</div>
+		)
+	}
+</article>
+
+<style>
+	.body {
+		margin-top: var(--spacing-8);
+	}
+</style>

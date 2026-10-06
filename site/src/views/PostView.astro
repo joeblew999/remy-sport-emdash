@@ -1,0 +1,100 @@
+---
+import type { ContentEntry, InferCollectionData } from "emdash";
+import { Image, PortableText } from "emdash/ui";
+import { formatDate, t } from "../i18n/ui";
+import { getReadingTime } from "../lib/reading-time";
+import { localeOf, localePath } from "../lib/site";
+
+interface Props {
+	post: ContentEntry<InferCollectionData<"posts">>;
+}
+
+const { post } = Astro.props;
+const locale = localeOf(Astro);
+const published = formatDate(locale, post.data.publishedAt);
+const base = localePath("/blog", locale);
+const terms = [
+	...(post.data.terms?.audience ?? []).map((term) => ({ label: term.label, href: `${base}?audience=${term.slug}` })),
+	...(post.data.terms?.topic ?? []).map((term) => ({ label: term.label, href: `${base}?topic=${term.slug}` })),
+];
+---
+
+<article class="narrow">
+	<header class="page-head">
+		<p class="back"><a href={base}>← {t(locale, "backToBlog")}</a></p>
+		<h1 {...post.edit.title}>{post.data.title}</h1>
+		{post.data.excerpt && <p class="lead" {...post.edit.excerpt}>{post.data.excerpt}</p>}
+		<p class="meta">
+			{
+				published && (
+					<>
+						{t(locale, "published")}{" "}
+						<time datetime={post.data.publishedAt?.toISOString()}>{published}</time>
+						{" · "}
+					</>
+				)
+			}
+			{getReadingTime(post.data.content)}{" "}
+			{t(locale, "minRead")}
+		</p>
+	</header>
+
+	{
+		post.data.featured_image && (
+			<div class="cover" {...post.edit.featured_image}>
+				<Image image={post.data.featured_image} />
+			</div>
+		)
+	}
+
+	<div class="prose" {...post.edit.content}>
+		<PortableText value={post.data.content} />
+	</div>
+
+	{
+		terms.length > 0 && (
+			<ul class="terms">
+				{terms.map((term) => (
+					<li>
+						<a href={term.href}>{term.label}</a>
+					</li>
+				))}
+			</ul>
+		)
+	}
+</article>
+
+<style>
+	.back {
+		margin-bottom: var(--spacing-6);
+		font-size: var(--font-size-sm);
+	}
+
+	.meta {
+		margin-top: var(--spacing-4);
+		font-size: var(--font-size-sm);
+		color: var(--color-muted);
+	}
+
+	.cover {
+		margin-bottom: var(--spacing-8);
+		overflow: hidden;
+		border-radius: var(--radius-lg);
+	}
+
+	.terms {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-2);
+		margin-top: var(--spacing-12);
+		list-style: none;
+		font-size: var(--font-size-sm);
+	}
+
+	.terms a {
+		padding: var(--spacing-1) var(--spacing-3);
+		color: var(--color-text-secondary);
+		background: var(--color-surface);
+		border-radius: 999px;
+	}
+</style>

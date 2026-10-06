@@ -1,33 +1,306 @@
 /*
-  theme.css -- your theme overrides. This is the file to edit to
-  retheme the site.
+  theme.css -- this site's look, on top of the template's tokens (tokens.css).
+  Declarations here are unlayered, so they beat the @layer base defaults.
 
-  Every design token lives in src/styles/tokens.css (colors, type
-  scale, spacing, layout, shadows) with its default value. Override any
-  of them here: declarations in this file are unlayered, so they always
-  beat the @layer base defaults in tokens.css.
-
-  Colors are defined with light-dark(). Overriding with a plain color
-  changes light and dark mode at once; use light-dark(<light>, <dark>)
-  to set different values per mode.
-
-  Webfonts are loaded in astro.config.mjs (--font-body, --font-mono).
-  Swap the loaded font there; use overrides here for system fonts or a
-  separate heading face.
-
-  Example:
-
-  :root {
-    --color-brand: light-dark(#0f766e, #2dd4bf);
-    --font-heading: "Iowan Old Style", Georgia, serif;
-    --radius: 8px;
-  }
+  The colours and faces are the app's, copied by hand once (its src/web/styles.css): Inter, Noto
+  Sans Thai, and its primary orange. Two consumers do not need a shared package.
 */
 
 :root {
+	/* The app's primary, oklch(0.553 0.195 38.402). Lighter in dark mode so links stay readable. */
+	--color-brand: light-dark(#c2410c, #fb923c);
+	--color-brand-hover: light-dark(#9a3412, #fdba74);
+	/* Filled buttons keep one orange in both modes: white text on it passes contrast. */
+	--color-brand-solid: #c2410c;
+	--color-brand-solid-hover: #9a3412;
+	--font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+	--radius: 6px;
+	--radius-lg: 12px;
 }
 
-/* Keep the signed-in Admin link separated from the primary navigation. */
-.nav-admin {
-	margin-inline-start: var(--spacing-5);
+@supports not (color: light-dark(#000, #fff)) {
+	:root {
+		--color-brand: #c2410c;
+		--color-brand-hover: #9a3412;
+	}
+}
+
+/*
+  The ground every page stands on. In a layer, so anything below — and any component's own
+  style — wins without a fight. EmDash's own interface (the edit toolbar) is left alone.
+*/
+@layer base {
+	*:where(:not([class*="emdash"]):not([class*="ec-"])),
+	*:where(:not([class*="emdash"]):not([class*="ec-"]))::before,
+	*:where(:not([class*="emdash"]):not([class*="ec-"]))::after {
+		box-sizing: border-box;
+	}
+
+	body,
+	h1,
+	h2,
+	h3,
+	h4,
+	p,
+	ul,
+	ol,
+	figure,
+	blockquote {
+		margin: 0;
+	}
+
+	ul,
+	ol {
+		padding: 0;
+	}
+
+	/* The footer's theme buttons pin the scheme; with no class the device decides. */
+	@supports (color: light-dark(#000, #fff)) {
+		:root.light {
+			color-scheme: light;
+		}
+
+		:root.dark {
+			color-scheme: dark;
+		}
+	}
+
+	body {
+		font-family: var(--font-body);
+		font-size: var(--font-size-base);
+		line-height: var(--leading-normal);
+		color: var(--color-text);
+		background: var(--color-bg);
+		-webkit-font-smoothing: antialiased;
+		text-rendering: optimizeLegibility;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: var(--font-heading);
+		font-weight: var(--font-weight-heading);
+		line-height: var(--leading-tight);
+		letter-spacing: var(--tracking-snug);
+		text-wrap: balance;
+	}
+
+	h1 {
+		font-weight: var(--font-weight-display);
+	}
+
+	a {
+		color: var(--color-brand);
+		text-decoration: none;
+	}
+
+	a:hover {
+		color: var(--color-brand-hover);
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-brand);
+		outline-offset: 2px;
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+}
+
+/* Thai text takes the Thai face first; Inter has no Thai glyphs. */
+:lang(th) {
+	font-family: var(--font-thai), var(--font-body);
+	line-height: 1.8;
+}
+
+/* Layout shared by every page */
+.wrap {
+	max-width: var(--wide-width);
+	margin: 0 auto;
+	padding: 0 var(--spacing-6);
+}
+
+.narrow {
+	max-width: calc(var(--content-width) + 2 * var(--spacing-6));
+	margin: 0 auto;
+	padding: 0 var(--spacing-6);
+}
+
+.page-head {
+	padding: var(--spacing-16) 0 var(--spacing-8);
+}
+
+.page-head h1 {
+	font-size: clamp(var(--font-size-3xl), 5vw, var(--font-size-5xl));
+	max-width: 20ch;
+}
+
+.lead {
+	margin-top: var(--spacing-4);
+	font-size: var(--font-size-xl);
+	line-height: var(--leading-normal);
+	color: var(--color-text-secondary);
+	max-width: 46ch;
+}
+
+.section-label {
+	font-size: var(--font-size-sm);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wider);
+	color: var(--color-muted);
+	margin-bottom: var(--spacing-6);
+}
+
+/* Buttons */
+.btn {
+	display: inline-block;
+	padding: var(--spacing-3) var(--spacing-6);
+	font-weight: 600;
+	border-radius: var(--radius);
+	border: 1px solid transparent;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.btn-primary,
+.btn-primary:hover {
+	background: var(--color-brand-solid);
+	color: #fff !important;
+}
+
+.btn-primary:hover {
+	background: var(--color-brand-solid-hover);
+}
+
+.btn-small {
+	padding: var(--spacing-2) var(--spacing-4);
+	font-size: var(--font-size-sm);
+}
+
+.cta-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--spacing-4);
+	margin-top: var(--spacing-8);
+}
+
+/* Cards */
+.cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: var(--spacing-6);
+	list-style: none;
+}
+
+.card {
+	display: block;
+	height: 100%;
+	padding: var(--spacing-6);
+	color: var(--color-text) !important;
+	background: var(--color-bg);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-lg);
+}
+
+.card:hover {
+	border-color: var(--color-brand);
+}
+
+.card h3 {
+	font-size: var(--font-size-xl);
+	margin-bottom: var(--spacing-2);
+}
+
+.card p {
+	color: var(--color-text-secondary);
+	font-size: var(--font-size-sm);
+	line-height: var(--leading-normal);
+}
+
+.card .meta {
+	margin-bottom: var(--spacing-2);
+	font-size: var(--font-size-xs);
+	color: var(--color-muted);
+}
+
+/* Rich text from the editor */
+.prose > * + * {
+	margin-top: 1.25em;
+}
+
+.prose h2 {
+	font-size: var(--font-size-2xl);
+	margin-top: 2em;
+}
+
+.prose h3 {
+	font-size: var(--font-size-xl);
+	margin-top: 1.75em;
+}
+
+.prose ul,
+.prose ol {
+	padding-inline-start: var(--spacing-6);
+}
+
+.prose li + li {
+	margin-top: 0.5em;
+}
+
+.prose a {
+	text-decoration: underline;
+}
+
+.prose blockquote {
+	padding-inline-start: var(--spacing-6);
+	border-inline-start: 3px solid var(--color-border);
+	color: var(--color-text-secondary);
+}
+
+.prose img {
+	border-radius: var(--radius-lg);
+}
+
+.prose table {
+	display: block;
+	overflow-x: auto;
+	border-collapse: collapse;
+	font-size: var(--font-size-sm);
+}
+
+.prose th,
+.prose td {
+	padding: var(--spacing-2) var(--spacing-3);
+	border: 1px solid var(--color-border);
+	text-align: start;
+}
+
+.prose pre,
+.prose code {
+	font-family: var(--font-mono);
+	font-size: 0.9em;
+}
+
+.placeholder-banner {
+	padding: var(--spacing-4);
+	font-weight: 600;
+	background: var(--color-surface);
+	border: 2px dashed var(--color-brand);
+	border-radius: var(--radius);
+}
+
+@media (max-width: 760px) {
+	.wrap,
+	.narrow {
+		padding: 0 var(--spacing-4);
+	}
+
+	.page-head {
+		padding: var(--spacing-10) 0 var(--spacing-6);
+	}
 }

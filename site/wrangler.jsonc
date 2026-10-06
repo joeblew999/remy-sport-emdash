@@ -4,6 +4,12 @@
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": ["nodejs_compat"],
+	// Where this site sends people, and which app it reads. Read in src/lib/app.ts and nowhere
+	// else. A local `.dev.vars` (gitignored) can set APP_API_ORIGIN to the app's staging twin.
+	"vars": {
+		"APP_ORIGIN": "https://remy.ubuntusoftware.net",
+		"HELP_ORIGIN": "https://help.remy.ubuntusoftware.net",
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",

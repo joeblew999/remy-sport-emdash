@@ -1,0 +1,86 @@
+---
+// The landing page: what it is, who it is for, one way into the app. All of the words are
+// content — the `home` page entry, and the title and summary of each audience page.
+import type { ContentEntry, InferCollectionData } from "emdash";
+import { PortableText } from "emdash/ui";
+import PostCard from "../components/PostCard.astro";
+import { t } from "../i18n/ui";
+import { appHref } from "../lib/app";
+import { localeOf, localePath } from "../lib/site";
+
+type Page = ContentEntry<InferCollectionData<"pages">>;
+type Post = ContentEntry<InferCollectionData<"posts">>;
+
+interface Props {
+	home: Page;
+	audiences: Page[];
+	posts: Post[];
+}
+
+const { home, audiences, posts } = Astro.props;
+const locale = localeOf(Astro);
+---
+
+<div class="wrap">
+	<header class="page-head">
+		<h1 {...home.edit.title}>{home.data.title}</h1>
+		{home.data.summary && <p class="lead" {...home.edit.summary}>{home.data.summary}</p>}
+		<div class="cta-row">
+			<a class="btn btn-primary" href={appHref({ page: "home" }, "home")}>{t(locale, "openApp")}</a>
+		</div>
+	</header>
+
+	{
+		audiences.length > 0 && (
+			<section class="home-section" aria-labelledby="who">
+				<h2 class="section-label" id="who">
+					{t(locale, "whoItIsFor")}
+				</h2>
+				<ul class="cards">
+					{audiences.map((page) => (
+						<li>
+							<a class="card" href={localePath(`/${page.id}`, locale)}>
+								<h3>{page.data.title}</h3>
+								{page.data.summary && <p>{page.data.summary}</p>}
+							</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		)
+	}
+</div>
+
+<section class="narrow home-section prose" {...home.edit.content}>
+	<PortableText value={home.data.content} />
+</section>
+
+{
+	posts.length > 0 && (
+		<section class="wrap home-section" aria-labelledby="latest">
+			<h2 class="section-label" id="latest">
+				{t(locale, "latestPosts")}
+			</h2>
+			<ul class="cards">
+				{posts.map((post) => (
+					<li>
+						<PostCard post={post} />
+					</li>
+				))}
+			</ul>
+			<p class="more">
+				<a href={localePath("/blog", locale)}>{t(locale, "allPosts")} →</a>
+			</p>
+		</section>
+	)
+}
+
+<style>
+	.home-section {
+		margin-top: var(--spacing-12);
+	}
+
+	.more {
+		margin-top: var(--spacing-6);
+	}
+</style>
