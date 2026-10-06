@@ -34,7 +34,7 @@ edits. Run `mise run dev` after changing `mise.toml`, the seed, or a plugin.
 | Name | "Remy Sport" is the working title. Keep the name in the site settings and the seed — never hardcode it in a page — so a rebrand is one edit |
 | Privacy line | Only events and organisations are shown. Nothing that names a person — above all a child — is ever rendered here, whatever the app's API will hand over |
 | Editors | Gerard as Admin, Remy as Editor |
-| Repo | Private. No open licence |
+| Repo | Public. No licence yet — all rights reserved until one is chosen |
 
 ## Not decided yet
 
