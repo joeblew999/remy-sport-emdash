@@ -1,0 +1,5 @@
+.src/
+/run/
+node_modules/
+.env
+/.claude/skills/

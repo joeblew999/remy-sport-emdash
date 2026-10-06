@@ -1,0 +1,13 @@
+{
+	"useTabs": true,
+	"experimentalSortImports": {},
+	"ignorePatterns": [
+		".src/**",
+		"**/dist/**",
+		"**/node_modules/**",
+		"**/package.json",
+		"**/emdash-env.d.ts",
+		"**/worker-configuration.d.ts",
+		"docs/**"
+	]
+}

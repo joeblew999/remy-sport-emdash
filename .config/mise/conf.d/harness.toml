@@ -1,0 +1,216 @@
+# The harness: tools, tasks and daemons. Owned by emdash-run and replaced by `mise run upgrade` —
+# do not edit it in a project. Project settings live in mise.toml; the logic lives in nu/.
+
+[settings]
+experimental = true # `mise daemons`
+
+[tools]
+node = "26.10.0"
+pnpm = "12.9.1"
+pitchfork = "2.29.0" # runs the daemons, through `mise daemons`
+nushell = "0.116.1"  # the language of nu/ — the same on every platform
+fnox = "1.36.0"      # secrets: Cloudflare credentials for deploy and the R2 check
+
+[task_config]
+shell = "nu --no-config-file -c"
+
+[env]
+HARNESS_VERSION = "0.6.0"
+HARNESS_REPO = "https://github.com/joeblew999/emdash-run"
+# npm command-line tools the harness runs through `pnpm dlx`, pinned here. The two oxlint packages
+# are version-coupled: move them together.
+OXLINT_VERSION = "1.86.0"
+TSGOLINT_VERSION = "7.0.2003"
+OXFMT_VERSION = "0.71.0"
+SKILLS_VERSION = "1.7.0"
+# Defaults for every optional project setting. mise.toml wins over this file, so a project's values
+# replace these — and a setting the project leaves out is EMPTY here rather than inherited from
+# whatever shell ran the task (another project's seed and checks, in the case that found this).
+DEPLOY_URL = ""
+VERIFY_COLLECTION = ""
+EMDASH_URL = ""
+ROOT = "{{config_root}}"
+SRC_DIR = "{{config_root}}/.src"                                  # gitignored checkouts
+TEMPLATES_DIR = "{{config_root}}/.src/templates"
+SITE_DIR = "{{config_root}}/site"                                 # the project's own site — created once from $TEMPLATE
+EMDASH_DIR = "{{config_root}}/.src/emdash"                        # the EmDash source, on demand
+PLUGINS_DIR = "{{config_root}}/plugins"
+RUN_DIR = "{{config_root}}/run"                                   # gitignored output: token, snapshots
+TEMPLATES_REPO = "https://github.com/emdash-cms/templates"
+SITE_EXAMPLE_REPO = "https://github.com/emdash-cms/emdashcms.com"
+EMDASH_REPO = "https://github.com/emdash-cms/emdash"
+SITE_URL = "http://localhost:4321"
+SITE_DAEMON = "site"
+REGISTRY_URL = "http://localhost:8788"
+REGISTRY_PORT = "8788"
+# The site's own emdash CLI on PATH, so the CLI and the site cannot drift apart.
+_.path = ["{{config_root}}/site/node_modules/.bin"]
+# The admin token `dev` mints, as EMDASH_MCP_TOKEN — .mcp.json reads it.
+_.file = "{{config_root}}/run/token-admin.env"
+# Unset on purpose. Both are read by the CLIs, and a stale value inherited from an old shell
+# silently redirects them: a dead token, or a registry nothing is running.
+EMDASH_TOKEN = false
+EMDASH_REGISTRY_URL = false
+
+# Every task is one command in nu/main.nu, named after the task (`plugin:new` runs `plugin new`).
+# nu/task.nu hands it the task's arguments — through `usage`, because mise does not append them on
+# Windows. `check` fails on a task that does not extend this template.
+[task_templates.harness]
+usage = 'arg "[args]" var=#true'
+run = "nu --no-config-file {{config_root}}/nu/task.nu"
+
+[tasks.setup]
+extends = "harness"
+description = "First time here: create site/ from the template (once), install, then bring the site up"
+
+[tasks.dev]
+extends = "harness"
+description = "Bring the site up on the current config, seed and plugins — run it after any change"
+
+[tasks.status]
+extends = "harness"
+description = "What is running, and on what: harness, template, EmDash, site, plugins, deployment"
+
+[tasks.report]
+extends = "harness"
+description = "Something broke? Prints your versions, status and recent site log, ready to paste into an issue"
+
+[tasks.check]
+extends = "harness"
+alias = "pre-commit"                                                                                                                     # what the git hook runs
+description = "Everything that must hold before a commit. --fix repairs formatting and generated docs; --site also type-checks the site"
+
+[tasks.doctor]
+extends = "harness"
+description = "Is the running site what the repo says it is? --url <deployment> checks a deployed one"
+
+[tasks.deploy]
+extends = "harness"
+description = "Check, build, deploy to Cloudflare, then verify what is live. --dry builds without deploying"
+
+[tasks.rollback]
+extends = "harness"
+description = "Put the previous deployment back, then verify what is live"
+
+[tasks.snapshot]
+extends = "harness"
+description = "Save the site — schema, content and media — as a .emdash package (not users, tokens or plugin data). --url snapshots a deployment"
+
+[tasks.restore]
+extends = "harness"
+description = "Restore a snapshot into an EMPTY site: shows the plan, --confirm executes it, --wipe empties the local site first"
+
+[tasks.reset]
+extends = "harness"
+description = "Wipe the local database and uploads, then bring the site back up on its seed. Your site/ is untouched"
+
+[tasks.logs]
+extends = "harness"
+description = "Follow the site's logs. --deployed follows the live Worker"
+
+[tasks.open]
+extends = "harness"
+description = "Open the admin in a browser, signed in"
+
+[tasks."plugin:new"]
+extends = "harness"
+description = "Scaffold a plugin with the official CLI, fit it to this site, load it, and have the running site call it"
+
+[tasks."plugin:dev"]
+extends = "harness"
+description = "Rebuild a plugin on change"
+
+[tasks."plugin:probe"]
+extends = "harness"
+description = "Ask the running site to call a plugin's route — proof it is loaded, not just built"
+
+[tasks."plugin:remove"]
+extends = "harness"
+description = "Remove a plugin and bring the site back up without it"
+
+[tasks."plugin:roundtrip"]
+extends = "harness"
+description = "Prove the plugin toolchain end to end with a throwaway plugin: scaffold, load, call, remove"
+
+[tasks."plugin:release"]
+extends = "harness"
+description = "Validate, typecheck, test, build and bundle plugins — everything short of publishing"
+
+[tasks."content:set"]
+extends = "harness"
+description = "Set fields on a live entry — e.g: mise run content:set -- pages about '{\"title\":\"About us\"}'"
+
+[tasks."schema:diff"]
+extends = "harness"
+description = "Compare the repo's content model with the running site's, or a deployment's with --url"
+
+[tasks."seed:export"]
+extends = "harness"
+description = "Export the running site's model and content as a seed, to review against the project's"
+
+[tasks."registry:up"]
+extends = "harness"
+description = "Start the optional local plugin registry and point the site at it (builds the EmDash monorepo the first time)"
+
+[tasks."registry:down"]
+extends = "harness"
+description = "Stop the local registry — the site goes back to the hosted one"
+
+[tasks.upgrade]
+extends = "harness"
+description = "Take a newer harness: replaces nu/ and .config/mise/conf.d/harness.toml with the latest release, then runs check. -- <tag> or -- main picks another"
+
+[tasks.verify]
+extends = "harness"
+description = "Does this project work on THIS machine? Site up, check, doctor. --full adds a plugin round trip, a snapshot and a build; --restore also wipes the local database and restores it"
+
+[tasks."verify:template"]
+extends = "harness"
+description = "Does the harness work on another template? Builds a throwaway project on it and runs verify — e.g: mise run verify:template -- starter. --from 1.0.1 proves an EmDash upgrade keeps the data"
+
+[tasks.upgrade-probe]
+extends = "harness"
+hide = true
+
+[tasks."verify:linux"]
+extends = "harness"
+description = "The same verification in a clean Linux container with only git and mise. Needs docker"
+
+[tasks.source]
+extends = "harness"
+description = "Clone or update a reference checkout under .src/ for reading: emdash (the default — EmDash's source at the version the site runs), templates, or emdashcms.com (EmDash's own production site)"
+
+[tasks.emdash]
+extends = "harness"
+description = "The official emdash CLI — e.g: mise run emdash -- schema list"
+
+[tasks.emdash-plugin]
+extends = "harness"
+description = "The official plugin CLI — e.g: mise run emdash-plugin -- login"
+
+[tasks.skills]
+extends = "harness"
+description = "The skills CLI — e.g: mise run skills -- list. Add with --copy: this repo allows no symlinks"
+
+[tasks.args]
+extends = "harness"
+hide = true
+
+[tasks."daemon:site"]
+extends = "harness"
+hide = true
+
+[tasks."daemon:registry"]
+extends = "harness"
+hide = true
+
+# Values here reach pitchfork verbatim — mise does not expand templates in [daemons].
+[daemons.site]
+run = "mise run daemon:site"
+dir = "."
+auto = ["start", "stop"]
+
+[daemons.registry]
+run = "mise run daemon:registry"
+dir = "."
+auto = ["stop"]
