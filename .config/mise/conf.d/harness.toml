@@ -15,7 +15,7 @@ fnox = "1.36.0"      # secrets: Cloudflare credentials for deploy and the R2 che
 shell = "nu --no-config-file -c"
 
 [env]
-HARNESS_VERSION = "0.6.0"
+HARNESS_VERSION = "0.6.1"
 HARNESS_REPO = "https://github.com/joeblew999/emdash-run"
 # npm command-line tools the harness runs through `pnpm dlx`, pinned here. The two oxlint packages
 # are version-coupled: move them together.
@@ -39,7 +39,9 @@ RUN_DIR = "{{config_root}}/run"                                   # gitignored o
 TEMPLATES_REPO = "https://github.com/emdash-cms/templates"
 SITE_EXAMPLE_REPO = "https://github.com/emdash-cms/emdashcms.com"
 EMDASH_REPO = "https://github.com/emdash-cms/emdash"
-SITE_URL = "http://localhost:4321"
+# The dev server's port. Give a second checkout its own (SITE_PORT in its mise.local.toml) and two
+# sites run side by side — which is what lets several people, or agents, work at once.
+SITE_PORT = "4321"
 SITE_DAEMON = "site"
 REGISTRY_URL = "http://localhost:8788"
 REGISTRY_PORT = "8788"

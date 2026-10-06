@@ -18,6 +18,10 @@ export def code [block: closure]: nothing -> int {
   try { do $block; 0 } catch {|err| $err | get -o exit_code | default 1 }
 }
 
+# Where the local site answers. Built here, not in mise's [env]: a checkout that overrides
+# SITE_PORT in mise.local.toml must get a URL that follows it.
+export def site-url []: nothing -> string { $"http://localhost:($env.SITE_PORT)" }
+
 # The harness-owned mise config: tools, tasks, daemons.
 export def harness-file []: nothing -> string { $env.ROOT | path join ".config" "mise" "conf.d" "harness.toml" }
 
@@ -164,7 +168,7 @@ export def with-site-paused [block: closure]: nothing -> int {
   rm -rf ($env.SITE_DIR | path join "node_modules" ".vite") ($env.SITE_DIR | path join ".astro")
   if $was_running {
     ^mise daemons start $env.SITE_DAEMON
-    if not (wait-for $env.SITE_URL 90) { print "  ⚠ the site was restarted but is not answering yet — see: mise run logs" }
+    if not (wait-for (site-url) 90) { print "  ⚠ the site was restarted but is not answering yet — see: mise run logs" }
   }
   $rc
 }

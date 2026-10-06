@@ -139,7 +139,7 @@ export def probe [name: string, route: string] {
   let token_file = ($env.RUN_DIR | path join "token-admin.txt")
   if not ($token_file | path exists) { fail "no admin token" "run: mise run dev" }
   let res = (
-    request POST $"($env.SITE_URL)/_emdash/api/plugins/($slug)/($route)"
+    request POST $"(site-url)/_emdash/api/plugins/($slug)/($route)"
       --headers {Authorization: $"Bearer (open --raw $token_file | str trim)", "X-EmDash-Request": "1"}
   )
   if ($res.body | describe | str starts-with "record") and ($res.body | get -o success) == true {

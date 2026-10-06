@@ -234,7 +234,7 @@ export def restart [--empty] {
     let deadline = ((date now) + 90sec)
     mut setup: any = {status: 0, body: null}
     loop {
-      $setup = (request POST $"($env.SITE_URL)/_emdash/api/setup/dev-bypass($query)" --timeout 5min)
+      $setup = (request POST $"(site-url)/_emdash/api/setup/dev-bypass($query)" --timeout 5min)
       if $setup.status != 0 or (date now) > $deadline { break }
       sleep 1sec
     }
@@ -253,7 +253,7 @@ export def restart [--empty] {
   fail "the site did not come up after two starts" "the last lines of its log are above; more: mise run logs"
 }
 
-export def admin-url []: nothing -> string { $"($env.SITE_URL)/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin" }
+export def admin-url []: nothing -> string { $"(site-url)/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin" }
 
 # What a dev can do next — printed when the site comes up.
 export def next-steps [] {
@@ -268,9 +268,9 @@ export def next-steps [] {
 }
 
 export def urls [] {
-  print $"  site    ($env.SITE_URL)"
+  print $"  site    (site-url)"
   print $"  admin   (admin-url)"
-  print $"  mcp     ($env.SITE_URL)/_emdash/api/mcp — bearer token in run/token-admin.txt"
+  print $"  mcp     (site-url)/_emdash/api/mcp — bearer token in run/token-admin.txt"
   if (setting DEPLOY_URL | is-not-empty) { print $"  live    ($env.DEPLOY_URL)" }
 }
 
@@ -286,7 +286,7 @@ export def serve [] {
   if (answers $"($env.REGISTRY_URL)/health") { $env.EMDASH_REGISTRY_URL = $env.REGISTRY_URL }
   # Bound to IPv4 on purpose. Astro's default listens on [::1] only, and on Linux `localhost`
   # resolves to 127.0.0.1 first — so the emdash CLI was refused there while curl worked.
-  ^pnpm --dir $env.SITE_DIR dev --host 127.0.0.1
+  ^pnpm --dir $env.SITE_DIR dev --host 127.0.0.1 --port $env.SITE_PORT
 }
 
 # Type-check the site: astro check loads the config, tsc checks the config's types. Both re-run

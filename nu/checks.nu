@@ -175,7 +175,7 @@ def report [passed: bool, label: string, detail: string]: nothing -> bool {
 # Is the running site (or the deployment in EMDASH_URL) alive and holding content? It answers, and
 # — when VERIFY_COLLECTION names one — that collection has entries and every one carries data.
 export def verify []: nothing -> bool {
-  let target = (if (setting EMDASH_URL | is-empty) { $env.SITE_URL } else { $env.EMDASH_URL })
+  let target = (if (setting EMDASH_URL | is-empty) { (site-url) } else { $env.EMDASH_URL })
   if not (wait-for $target 60) { return (report false $"($target) responds" "no answer") }
   let up = (report true $"($target) responds" "")
   let collection = (setting VERIFY_COLLECTION)

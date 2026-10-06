@@ -62,7 +62,7 @@ def "main status" [] {
   print $"  harness   ($env.HARNESS_VERSION)"
   print $"  template  ($env.TEMPLATE)"
   print $"  emdash    (if ($installed | path exists) { open $installed | get version } else { 'not installed — run: mise run setup' })"
-  print $"  site      (if $site_up { $'running at ($env.SITE_URL)' } else { 'stopped — run: mise run dev' })"
+  print $"  site      (if $site_up { $'running at (site-url)' } else { 'stopped — run: mise run dev' })"
   print $"  plugins   (if ($plugins | is-empty) { 'none — make one: mise run plugin:new -- <name>' } else { $plugins | str join ', ' })"
   print $"  sources   (site source-heads | str join ', ')"
   print $"  registry  (if (answers $'($env.REGISTRY_URL)/health') { $'local, at ($env.REGISTRY_URL)' } else { 'hosted' })"
