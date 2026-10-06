@@ -1,23 +1,28 @@
 {
 	"$schema": "https://emdashcms.com/seed.schema.json",
 	"version": "1",
+	"defaultLocale": "en",
 	"meta": {
-		"name": "Blog Starter",
-		"description": "A blog with posts and pages",
-		"author": "EmDash"
+		"name": "Remy Sport site",
+		"description": "The public site: landing and audience pages, the blog. Events and organisations are read from the app, never stored here."
 	},
 	"settings": {
-		"title": "My Blog",
-		"tagline": "Thoughts on building for the web"
+		"title": "Remy Sport",
+		"tagline": "Basketball events, teams and live scoring for Thailand."
 	},
 	"collections": [
 		{
-			"slug": "posts",
-			"label": "Posts",
-			"labelSingular": "Post",
-			"urlPattern": "/posts/{slug}",
-			"supports": ["drafts", "revisions", "preview", "scheduling", "search", "seo"],
-			"commentsEnabled": true,
+			"slug": "pages",
+			"label": "Pages",
+			"labelSingular": "Page",
+			"urlPattern": "/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search",
+				"seo"
+			],
 			"fields": [
 				{
 					"slug": "title",
@@ -27,8 +32,56 @@
 					"searchable": true
 				},
 				{
+					"slug": "summary",
+					"label": "Summary",
+					"type": "text",
+					"searchable": true
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "placeholder",
+					"label": "Placeholder (shows a draft banner and keeps search engines away; untick when the text is final)",
+					"type": "boolean",
+					"defaultValue": false,
+					"translatable": false
+				}
+			]
+		},
+		{
+			"slug": "posts",
+			"label": "Posts",
+			"labelSingular": "Post",
+			"urlPattern": "/blog/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search",
+				"seo"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "excerpt",
+					"label": "Excerpt",
+					"type": "text",
+					"searchable": true
+				},
+				{
 					"slug": "featured_image",
-					"label": "Featured Image",
+					"label": "Cover image",
 					"type": "image"
 				},
 				{
@@ -38,274 +91,1335 @@
 					"searchable": true
 				},
 				{
-					"slug": "excerpt",
-					"label": "Excerpt",
-					"type": "text"
-				}
-			]
-		},
-		{
-			"slug": "pages",
-			"label": "Pages",
-			"labelSingular": "Page",
-			"urlPattern": "/pages/{slug}",
-			"supports": ["drafts", "revisions", "preview", "search", "seo"],
-			"fields": [
-				{
-					"slug": "title",
-					"label": "Title",
-					"type": "string",
-					"required": true,
-					"searchable": true
-				},
-				{
-					"slug": "content",
-					"label": "Content",
-					"type": "portableText",
-					"searchable": true
+					"slug": "angle",
+					"label": "Angle (editors only: the one point this post makes)",
+					"type": "string"
 				}
 			]
 		}
 	],
 	"taxonomies": [
 		{
-			"name": "category",
-			"label": "Categories",
-			"labelSingular": "Category",
-			"hierarchical": true,
-			"collections": ["posts"],
-			"terms": [
-				{
-					"slug": "development",
-					"label": "Development"
-				},
-				{
-					"slug": "design",
-					"label": "Design"
-				},
-				{
-					"slug": "notes",
-					"label": "Notes"
-				}
-			]
-		},
-		{
-			"name": "tag",
-			"label": "Tags",
-			"labelSingular": "Tag",
+			"name": "audience",
+			"label": "Audiences",
+			"labelSingular": "Audience",
 			"hierarchical": false,
-			"collections": ["posts"],
+			"collections": [
+				"posts"
+			],
 			"terms": [
 				{
-					"slug": "webdev",
-					"label": "Web Development"
+					"slug": "organisers",
+					"label": "Organisers"
 				},
 				{
-					"slug": "opinion",
-					"label": "Opinion"
+					"slug": "coaches",
+					"label": "Coaches"
 				},
 				{
-					"slug": "tools",
-					"label": "Tools"
+					"slug": "parents",
+					"label": "Parents"
 				},
 				{
-					"slug": "creativity",
-					"label": "Creativity"
+					"slug": "players",
+					"label": "Players"
+				},
+				{
+					"slug": "general",
+					"label": "Everyone"
 				}
 			]
-		}
-	],
-	"bylines": [
-		{
-			"id": "byline-editorial",
-			"slug": "emdash-editorial",
-			"displayName": "EmDash Editorial"
 		},
 		{
-			"id": "byline-guest",
-			"slug": "guest-contributor",
-			"displayName": "Guest Contributor",
-			"isGuest": true
+			"name": "topic",
+			"label": "Topics",
+			"labelSingular": "Topic",
+			"hierarchical": false,
+			"collections": [
+				"posts"
+			],
+			"terms": [
+				{
+					"slug": "events-guide",
+					"label": "Events guide"
+				},
+				{
+					"slug": "product",
+					"label": "Product"
+				}
+			]
 		}
 	],
 	"menus": [
 		{
+			"id": "menu:primary:en",
 			"name": "primary",
-			"label": "Primary Navigation",
+			"label": "Primary navigation",
+			"locale": "en",
 			"items": [
 				{
 					"type": "custom",
-					"label": "Home",
-					"url": "/"
+					"label": "For organisers",
+					"url": "/organisers"
 				},
+				{
+					"type": "custom",
+					"label": "For coaches",
+					"url": "/coaches"
+				},
+				{
+					"type": "custom",
+					"label": "For parents",
+					"url": "/parents"
+				},
+				{
+					"type": "custom",
+					"label": "Blog",
+					"url": "/blog"
+				}
+			]
+		},
+		{
+			"id": "menu:footer:en",
+			"name": "footer",
+			"label": "Footer",
+			"locale": "en",
+			"items": [
 				{
 					"type": "custom",
 					"label": "About",
-					"url": "/pages/about"
+					"url": "/about"
 				},
 				{
 					"type": "custom",
-					"label": "Posts",
-					"url": "/posts"
-				}
-			]
-		}
-	],
-	"widgetAreas": [
-		{
-			"name": "sidebar",
-			"label": "Sidebar",
-			"description": "Widget area displayed on single post pages",
-			"widgets": [
-				{
-					"type": "component",
-					"componentId": "core:search",
-					"title": "Search"
+					"label": "Privacy",
+					"url": "/privacy"
 				},
 				{
-					"type": "component",
-					"componentId": "core:categories",
-					"title": "Categories"
-				},
-				{
-					"type": "component",
-					"componentId": "core:tags",
-					"title": "Tags"
-				},
-				{
-					"type": "component",
-					"componentId": "core:recent-posts",
-					"title": "Recent Posts",
-					"settings": {
-						"count": 5,
-						"showDate": true
-					}
-				},
-				{
-					"type": "component",
-					"componentId": "core:archives",
-					"title": "Archives",
-					"settings": {
-						"type": "monthly",
-						"limit": 6
-					}
+					"type": "custom",
+					"label": "Terms",
+					"url": "/terms"
 				}
 			]
 		},
 		{
+			"id": "menu:primary:th",
+			"name": "primary",
+			"label": "Primary navigation",
+			"locale": "th",
+			"items": [
+				{
+					"type": "custom",
+					"label": "สำหรับผู้จัดงาน",
+					"url": "/organisers"
+				},
+				{
+					"type": "custom",
+					"label": "สำหรับโค้ช",
+					"url": "/coaches"
+				},
+				{
+					"type": "custom",
+					"label": "สำหรับผู้ปกครอง",
+					"url": "/parents"
+				},
+				{
+					"type": "custom",
+					"label": "บล็อก",
+					"url": "/blog"
+				}
+			],
+			"translationOf": "menu:primary:en"
+		},
+		{
+			"id": "menu:footer:th",
 			"name": "footer",
 			"label": "Footer",
-			"description": "Widget area displayed in the site footer",
-			"widgets": [
+			"locale": "th",
+			"items": [
 				{
-					"type": "content",
-					"title": "About",
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "A blog about software, design, and the occasional stray thought.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						}
-					]
-				}
-			]
-		}
-	],
-	"sections": [
-		{
-			"slug": "newsletter-signup",
-			"title": "Newsletter Signup",
-			"description": "A call-to-action block for newsletter subscriptions",
-			"keywords": ["newsletter", "subscribe", "email", "cta"],
-			"source": "theme",
-			"content": [
-				{
-					"_type": "block",
-					"style": "h3",
-					"children": [
-						{
-							"_type": "span",
-							"text": "Stay in the loop",
-							"_key": "k1"
-						}
-					],
-					"_key": "k0"
+					"type": "custom",
+					"label": "เกี่ยวกับเรา",
+					"url": "/about"
 				},
 				{
-					"_type": "block",
-					"style": "normal",
-					"children": [
-						{
-							"_type": "span",
-							"text": "Get notified when new posts are published. No spam, unsubscribe anytime.",
-							"_key": "k3"
-						}
-					],
-					"_key": "k2"
-				}
-			]
-		},
-		{
-			"slug": "about-author",
-			"title": "About the Author",
-			"description": "Brief author bio for use in posts or pages",
-			"keywords": ["author", "bio", "about"],
-			"source": "theme",
-			"content": [
+					"type": "custom",
+					"label": "ความเป็นส่วนตัว",
+					"url": "/privacy"
+				},
 				{
-					"_type": "block",
-					"style": "normal",
-					"children": [
-						{
-							"_type": "span",
-							"text": "A software developer who writes about building things on the web. Based somewhere with good coffee and reliable internet.",
-							"_key": "k1"
-						}
-					],
-					"_key": "k0"
+					"type": "custom",
+					"label": "ข้อกำหนด",
+					"url": "/terms"
 				}
-			]
+			],
+			"translationOf": "menu:footer:en"
 		}
 	],
 	"content": {
 		"pages": [
 			{
-				"id": "about",
-				"slug": "about",
+				"id": "page-home",
+				"slug": "home",
+				"locale": "en",
 				"status": "published",
 				"data": {
-					"title": "About",
+					"title": "Find and run basketball events in Thailand",
+					"summary": "One place for tournaments, leagues, camps and showcases: 3x3 and 5-on-5, for schools, clubs and everyone else.",
+					"placeholder": false,
 					"content": [
 						{
 							"_type": "block",
-							"style": "normal",
+							"_key": "k001",
+							"style": "h2",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "A place for writing about software, design, and the occasional stray thought. No posting schedule, no newsletter funnel. Just things I wanted to write down.",
-									"_key": "k1"
+									"_key": "k000",
+									"text": "What it is",
+									"marks": []
 								}
-							],
-							"_key": "k0"
+							]
 						},
 						{
 							"_type": "block",
+							"_key": "k003",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "Built with Astro and EmDash. The source is open if you want to see how it works.",
-									"_key": "k3"
+									"_key": "k002",
+									"text": "Basketball events in Thailand are announced in Facebook groups, LINE groups and Google Forms. Finding one means knowing which group to be in.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k005",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k004",
+									"text": "This is a single place to find those events, and the tool organisers use to run them: divisions, fixtures, scores, results and standings.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k007",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k006",
+									"text": "What works today",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k009",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k008",
+									"text": "Browse and filter events, and open a page for each one.",
+									"marks": []
 								}
 							],
-							"_key": "k2"
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k011",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k010",
+									"text": "Create and edit an event, alone or with co-organisers.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k013",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k012",
+									"text": "Set up organisations, teams and divisions.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k015",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k014",
+									"text": "Build fixtures, enter scores and set the status of a match.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k017",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k016",
+									"text": "Read results and standings without an account.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k019",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k018",
+									"text": "Use it in Thai or in English, in a browser or installed on a phone.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k021",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k020",
+									"text": "What is not ready",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k023",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k022",
+									"text": "Team registration and rosters are being built. You can see them in the app, but you cannot register a team there yet.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-organisers",
+				"slug": "organisers",
+				"locale": "en",
+				"status": "published",
+				"data": {
+					"title": "For organisers",
+					"summary": "Run a tournament, league, camp or showcase from one place instead of a spreadsheet, a form and a chat group.",
+					"placeholder": false,
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k025",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k024",
+									"text": "What you can do today",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k027",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k026",
+									"text": "Create an event and edit it as plans change.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k029",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k028",
+									"text": "Add co-organisers so the work is shared.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k031",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k030",
+									"text": "Set up your organisation and the divisions of the event.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k033",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k032",
+									"text": "Build the fixtures.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k035",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k034",
+									"text": "Enter scores and set the status of each match as the day goes on.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k037",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k036",
+									"text": "Results pages and standings follow from the scores you enter.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k039",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k038",
+									"text": "Signing in",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k041",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k040",
+									"text": "You sign in with a one-time code sent to your email address. There is no password to remember.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k043",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k042",
+									"text": "What is not ready",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k045",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k044",
+									"text": "Team registration is being built. Until it is open, teams cannot register for your event inside the app.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-coaches",
+				"slug": "coaches",
+				"locale": "en",
+				"status": "published",
+				"data": {
+					"title": "For coaches",
+					"summary": "Find events for your team, then follow fixtures, results and standings in one place.",
+					"placeholder": false,
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k047",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k046",
+									"text": "What you can do today",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k049",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k048",
+									"text": "Browse events across Thailand and filter them.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k051",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k050",
+									"text": "Open an event to see its dates, its divisions and who organises it.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k053",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k052",
+									"text": "Follow fixtures, results and standings during an event.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k055",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k054",
+									"text": "Use the app in Thai or in English.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k057",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k056",
+									"text": "3x3 and 5-on-5",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k059",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k058",
+									"text": "Both formats are covered, whether or not the event is FIBA-certified.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k061",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k060",
+									"text": "What is not ready",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k063",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k062",
+									"text": "Registering a team and managing its roster are being built. They are not open yet.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-parents",
+				"slug": "parents",
+				"locale": "en",
+				"status": "published",
+				"data": {
+					"title": "For parents",
+					"summary": "See where and when the games are, and how they went, without creating an account.",
+					"placeholder": false,
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k065",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k064",
+									"text": "What you can do today",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k067",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k066",
+									"text": "Find an event and read its page.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k069",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k068",
+									"text": "See fixtures, results and standings.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k071",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k070",
+									"text": "Read all of it without signing in.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k073",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k072",
+									"text": "Your child's name",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k075",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k074",
+									"text": "This website shows events and the organisations that run them. It does not show the names of players, coaches, parents or guardians, and it does not show team rosters.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k077",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k076",
+									"text": "What the app itself shows, and to whom, will be set out on the privacy page. That page is a draft until the owner has written it.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-about",
+				"slug": "about",
+				"locale": "en",
+				"status": "published",
+				"data": {
+					"title": "About",
+					"summary": "What this project is, and how to reach the people behind it.",
+					"placeholder": false,
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k079",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k078",
+									"text": "This project is for all basketball events in Thailand, not only school events: a page anyone can come to and find events. Registering to play through it is the aim, and it is not open yet.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k081",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k080",
+									"text": "It has two parts. This website is the part you can read without signing in. The app is where organisers run events and where everyone follows them.",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k083",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k082",
+									"text": "Contact",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k085",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k084",
+									"text": "Draft. Contact details have not been published yet. The owner needs to add an email address or a form here.",
+									"marks": [
+										"strong"
+									]
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k087",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k086",
+									"text": "Help",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k089",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k088",
+									"text": "How-to guides for the app are on the help site, linked at the bottom of every page.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-privacy",
+				"slug": "privacy",
+				"locale": "en",
+				"status": "published",
+				"data": {
+					"title": "Privacy",
+					"summary": "A placeholder for the privacy policy. Not yet written by the owner.",
+					"placeholder": true,
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k091",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k090",
+									"text": "What the final page has to cover",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k093",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k092",
+									"text": "Who is responsible for personal data on the platform, and how to contact them.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k095",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k094",
+									"text": "What personal data the app holds. It includes data about children who play.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k097",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k096",
+									"text": "Why each kind of data is held, and for how long.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k099",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k098",
+									"text": "Who can see what, with and without an account.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k101",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k100",
+									"text": "The rights of a person, and of a child's parent or guardian, under Thailand's Personal Data Protection Act (PDPA).",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k103",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k102",
+									"text": "How to ask for data to be corrected or deleted.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k105",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k104",
+									"text": "What this website does",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k107",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k106",
+									"text": "This website shows events and the organisations that run them. It does not show, store or link to anything that names a person.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-terms",
+				"slug": "terms",
+				"locale": "en",
+				"status": "published",
+				"data": {
+					"title": "Terms",
+					"summary": "A placeholder for the terms of use. Not yet written by the owner.",
+					"placeholder": true,
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k109",
+							"style": "h2",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k108",
+									"text": "What the final page has to cover",
+									"marks": []
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"_key": "k111",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k110",
+									"text": "Who offers the service.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k113",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k112",
+									"text": "What an organiser, a coach and a spectator may and may not do with it.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k115",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k114",
+									"text": "Who is responsible for the content of an event listing.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k117",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k116",
+									"text": "What happens when the terms change.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						}
+					]
+				}
+			},
+			{
+				"id": "page-home-th",
+				"slug": "home",
+				"locale": "th",
+				"translationOf": "page-home",
+				"status": "draft",
+				"data": {
+					"title": "[TH — needs translation] Find and run basketball events in Thailand",
+					"summary": "",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k119",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k118",
+									"text": "Thai translation needed. Translate from the English page, have a native speaker review it, then publish.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-organisers-th",
+				"slug": "organisers",
+				"locale": "th",
+				"translationOf": "page-organisers",
+				"status": "draft",
+				"data": {
+					"title": "[TH — needs translation] For organisers",
+					"summary": "",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k121",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k120",
+									"text": "Thai translation needed. Translate from the English page, have a native speaker review it, then publish.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-coaches-th",
+				"slug": "coaches",
+				"locale": "th",
+				"translationOf": "page-coaches",
+				"status": "draft",
+				"data": {
+					"title": "[TH — needs translation] For coaches",
+					"summary": "",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k123",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k122",
+									"text": "Thai translation needed. Translate from the English page, have a native speaker review it, then publish.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-parents-th",
+				"slug": "parents",
+				"locale": "th",
+				"translationOf": "page-parents",
+				"status": "draft",
+				"data": {
+					"title": "[TH — needs translation] For parents",
+					"summary": "",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k125",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k124",
+									"text": "Thai translation needed. Translate from the English page, have a native speaker review it, then publish.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-about-th",
+				"slug": "about",
+				"locale": "th",
+				"translationOf": "page-about",
+				"status": "draft",
+				"data": {
+					"title": "[TH — needs translation] About",
+					"summary": "",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k127",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k126",
+									"text": "Thai translation needed. Translate from the English page, have a native speaker review it, then publish.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-privacy-th",
+				"slug": "privacy",
+				"locale": "th",
+				"translationOf": "page-privacy",
+				"status": "draft",
+				"data": {
+					"title": "[TH — needs translation] Privacy",
+					"summary": "",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k129",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k128",
+									"text": "Thai translation needed. Translate from the English page, have a native speaker review it, then publish.",
+									"marks": []
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "page-terms-th",
+				"slug": "terms",
+				"locale": "th",
+				"translationOf": "page-terms",
+				"status": "draft",
+				"data": {
+					"title": "[TH — needs translation] Terms",
+					"summary": "",
+					"content": [
+						{
+							"_type": "block",
+							"_key": "k131",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k130",
+									"text": "Thai translation needed. Translate from the English page, have a native speaker review it, then publish.",
+									"marks": []
+								}
+							]
 						}
 					]
 				}
@@ -313,625 +1427,251 @@
 		],
 		"posts": [
 			{
-				"id": "post-1",
-				"slug": "building-for-the-long-term",
+				"id": "post-what-works-today",
+				"slug": "what-works-today",
+				"locale": "en",
 				"status": "published",
 				"data": {
-					"title": "Building for the Long Term",
-					"excerpt": "The frameworks will change. The databases will change. What survives is the clarity of your thinking.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=800&fit=crop",
-							"alt": "Code on a monitor in a dark room",
-							"filename": "building-long-term.jpg"
-						}
-					},
+					"title": "What works today, and what does not",
+					"excerpt": "A plain list of what you can do in the app now, and what is still being built.",
+					"angle": "An honest status report, so nobody arrives expecting registration to be open.",
 					"content": [
 						{
 							"_type": "block",
+							"_key": "k133",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "Every few years the industry collectively decides that everything we've been doing is wrong and there's a better way. New frameworks, new paradigms, new build tools. The churn is relentless, and if you're not careful, you spend more time migrating than building.",
-									"_key": "k1"
+									"_key": "k132",
+									"text": "Basketball events in Thailand are spread across Facebook groups, LINE groups and Google Forms. This project puts them in one place and gives organisers a tool to run them. Here is where it stands.",
+									"marks": []
 								}
-							],
-							"_key": "k0"
+							]
 						},
 						{
 							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "I've been writing software long enough to have seen several of these cycles. jQuery to Backbone to Angular to React to whatever comes next. Each transition felt urgent at the time. Looking back, the things that actually mattered were rarely about the framework.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
+							"_key": "k135",
 							"style": "h2",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "What survives",
-									"_key": "k5"
+									"_key": "k134",
+									"text": "You can do this now",
+									"marks": []
 								}
-							],
-							"_key": "k4"
+							]
 						},
 						{
 							"_type": "block",
+							"_key": "k137",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "Clean data models survive. Clear boundaries between systems survive. Good naming survives. The decision to keep things simple when you could have made them clever - that definitely survives.",
-									"_key": "k7"
+									"_key": "k136",
+									"text": "Sign in with a one-time code sent by email. There are no passwords.",
+									"marks": []
 								}
 							],
-							"_key": "k6"
+							"listItem": "bullet",
+							"level": 1
 						},
 						{
 							"_type": "block",
+							"_key": "k139",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "What doesn't survive is code that was written to impress, abstractions built for problems that never materialized, and architectures designed around a framework's opinions rather than the domain's reality.",
-									"_key": "k9"
+									"_key": "k138",
+									"text": "Browse and filter events, and open a page for each.",
+									"marks": []
 								}
 							],
-							"_key": "k8"
+							"listItem": "bullet",
+							"level": 1
 						},
 						{
 							"_type": "block",
+							"_key": "k141",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "The best code I've written is boring. It reads like prose, does one thing well, and doesn't require a PhD in category theory to understand. The worst code I've written was technically impressive at the time.",
-									"_key": "k11"
+									"_key": "k140",
+									"text": "Create and edit events, and share the work with co-organisers.",
+									"marks": []
 								}
 							],
-							"_key": "k10"
-						}
-					]
-				},
-				"bylines": [
-					{
-						"byline": "byline-editorial"
-					},
-					{
-						"byline": "byline-guest",
-						"roleLabel": "Guest essay"
-					}
-				],
-				"taxonomies": {
-					"category": ["development"],
-					"tag": ["opinion"]
-				}
-			},
-			{
-				"id": "post-2",
-				"slug": "the-case-for-static",
-				"status": "published",
-				"data": {
-					"title": "The Case for Static",
-					"excerpt": "Static sites aren't a step backwards. They're what you get when you take performance and simplicity seriously.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=1200&h=800&fit=crop",
-							"alt": "Laptop and coffee on a wooden table",
-							"filename": "case-for-static.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "There's a certain irony in the fact that the web started static, went dynamic, and is now swinging back toward static again. But the static sites of today aren't the hand-coded HTML pages of 1998. They're generated, optimized, and deployed to edge networks that serve them in milliseconds.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
+							"listItem": "bullet",
+							"level": 1
 						},
 						{
 							"_type": "block",
+							"_key": "k143",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "The pitch for server-rendered everything was compelling: dynamic content, personalization, real-time data. But most sites don't need most of that most of the time. A blog post doesn't need to be rendered on every request. A product page doesn't change every second.",
-									"_key": "k3"
+									"_key": "k142",
+									"text": "Set up organisations, teams and divisions.",
+									"marks": []
 								}
 							],
-							"_key": "k2"
+							"listItem": "bullet",
+							"level": 1
 						},
 						{
 							"_type": "block",
+							"_key": "k145",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k144",
+									"text": "Build fixtures, enter scores and set match status.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k147",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k146",
+									"text": "Read result pages and standings without an account.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k149",
+							"style": "normal",
+							"markDefs": [],
+							"children": [
+								{
+									"_type": "span",
+									"_key": "k148",
+									"text": "Use Thai or English.",
+									"marks": []
+								}
+							],
+							"listItem": "bullet",
+							"level": 1
+						},
+						{
+							"_type": "block",
+							"_key": "k151",
 							"style": "h2",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "The performance argument",
-									"_key": "k5"
+									"_key": "k150",
+									"text": "Still being built",
+									"marks": []
 								}
-							],
-							"_key": "k4"
+							]
 						},
 						{
 							"_type": "block",
+							"_key": "k153",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "A static file served from a CDN is as fast as the web gets. No cold starts, no database queries, no server-side rendering overhead. The Time to First Byte is essentially the network latency to your nearest edge node. You can't beat physics.",
-									"_key": "k7"
+									"_key": "k152",
+									"text": "Registering a team for an event.",
+									"marks": []
 								}
 							],
-							"_key": "k6"
+							"listItem": "bullet",
+							"level": 1
 						},
 						{
 							"_type": "block",
+							"_key": "k155",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "And when you do need dynamic behavior, you can add it surgically. An island of interactivity in a sea of static HTML. The best of both worlds, without paying the cost of either at all times.",
-									"_key": "k9"
+									"_key": "k154",
+									"text": "Managing a roster.",
+									"marks": []
 								}
 							],
-							"_key": "k8"
-						}
-					]
-				},
-				"bylines": [
-					{
-						"byline": "byline-editorial"
-					}
-				],
-				"taxonomies": {
-					"category": ["development"],
-					"tag": ["webdev", "opinion"]
-				}
-			},
-			{
-				"id": "post-3",
-				"slug": "learning-in-public",
-				"status": "published",
-				"data": {
-					"title": "Learning in Public",
-					"excerpt": "Writing about what you're learning is the fastest way to find out what you don't actually understand.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=1200&h=800&fit=crop",
-							"alt": "Notebook and pen on a desk",
-							"filename": "learning-in-public.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "I started writing about things I was learning not because I had anything original to say, but because I kept forgetting what I'd figured out. The blog posts were notes to my future self, published publicly more out of laziness than courage.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
+							"listItem": "bullet",
+							"level": 1
 						},
 						{
 							"_type": "block",
+							"_key": "k157",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "What I didn't expect was how much the writing itself would accelerate the learning. There's a particular kind of clarity that comes from trying to explain something to someone else. The gaps in your understanding, which you can happily ignore when the knowledge lives only in your head, become painfully obvious when you try to put it into sentences.",
-									"_key": "k3"
+									"_key": "k156",
+									"text": "Both exist in the app as things you can look at. Neither can be used yet.",
+									"marks": []
 								}
-							],
-							"_key": "k2"
+							]
 						},
 						{
 							"_type": "block",
+							"_key": "k159",
 							"style": "h2",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "The fear of being wrong",
-									"_key": "k5"
+									"_key": "k158",
+									"text": "This website",
+									"marks": []
 								}
-							],
-							"_key": "k4"
+							]
 						},
 						{
 							"_type": "block",
+							"_key": "k161",
 							"style": "normal",
+							"markDefs": [],
 							"children": [
 								{
 									"_type": "span",
-									"text": "The biggest barrier isn't time or writing skill. It's the fear of publishing something that turns out to be wrong. But here's the thing: being wrong publicly is one of the most efficient ways to learn. Someone will correct you, often kindly, and you'll remember that correction forever.",
-									"_key": "k7"
+									"_key": "k160",
+									"text": "The app is built for people who are signed in. This website is for everyone else: it says what the project is, and it will list events so that a search engine, or a link shared in a chat, shows something useful.",
+									"marks": []
 								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The posts that helped me most weren't written by experts. They were written by people one step ahead of me on the same path, in language that hadn't yet been polished into abstraction. There's a place for that kind of writing, and it's more valuable than most people realize.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
+							]
 						}
 					]
 				},
 				"taxonomies": {
-					"category": ["notes"],
-					"tag": ["opinion"]
-				}
-			},
-			{
-				"id": "post-4",
-				"slug": "small-tools-big-impact",
-				"status": "published",
-				"data": {
-					"title": "Small Tools, Big Impact",
-					"excerpt": "The best developer tools do one thing well and get out of your way. A love letter to focused software.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1575026615908-666710ae5e47?w=1200&h=800&fit=crop",
-							"alt": "Wrenches and hand tools hanging on a workshop wall",
-							"filename": "small-tools.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "There's a class of software that doesn't get enough appreciation. Not the frameworks or the platforms or the IDEs, but the small, sharp tools that solve one problem so well you stop thinking about them. They become invisible, which is the highest compliment you can pay a tool.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "I'm talking about things like ripgrep, which searches code so fast it changed how I think about searching. Or jq, which makes JSON feel like a first-class data format in the terminal. Or curl, which has been quietly powering the internet's plumbing for decades.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The Unix philosophy, revisited",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Do one thing well. The advice is old enough to be a cliche, but the best modern tools still follow it. They don't try to be platforms. They don't have plugin ecosystems or configuration languages or startup wizards. They do their job and they compose with other tools that do theirs.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The temptation is always to add more. One more feature, one more option, one more integration. But every addition is a decision someone has to make, a path through the code that has to be maintained, a thing that can break. The best tools resist this. They stay small, and in staying small, they stay reliable.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["development"],
-					"tag": ["tools"]
-				}
-			},
-			{
-				"id": "post-5",
-				"slug": "designing-with-constraints",
-				"status": "published",
-				"data": {
-					"title": "Designing with Constraints",
-					"excerpt": "Limitations aren't obstacles to creativity. They're the structure that makes creativity possible.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1513542789411-b6a5d4f31634?w=1200&h=800&fit=crop",
-							"alt": "Pencils and design tools on a desk",
-							"filename": "designing-with-constraints.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Give a designer a blank canvas and unlimited time, and they'll often produce something mediocre. Give them a tight brief, a small screen, and a deadline, and they'll surprise you. This isn't a paradox - it's how creativity actually works.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Constraints force decisions. When you can't use more than two typefaces, you have to choose carefully. When the page has to load in under a second, every element earns its place. When the interface has to work on a 320px screen, you discover what's truly essential.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Embracing the box",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The web itself is a constraint. HTML flows in one direction. CSS has a box model. Browsers have viewport sizes and font rendering quirks. You can fight these constraints or you can work with them, and the results are dramatically different.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The designs I admire most don't look like they were forced through a framework. They look like they grew naturally from the medium, respecting its grain rather than working against it. That only happens when you treat constraints as creative partners rather than enemies.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["design"],
-					"tag": ["creativity"]
-				}
-			},
-			{
-				"id": "post-6",
-				"slug": "a-weekend-with-a-side-project",
-				"status": "published",
-				"data": {
-					"title": "A Weekend with a Side Project",
-					"excerpt": "No stakeholders, no deadlines, no Jira tickets. Just you and a dumb idea that might turn into something.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1200&h=800&fit=crop",
-							"alt": "Code on a screen with a dark theme",
-							"filename": "weekend-side-project.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Saturday morning. Coffee's made, the house is quiet, and I've got an idea that's been nagging at me all week. Not a good idea, necessarily - just a persistent one. A small tool that does a thing I keep doing manually. How hard could it be?",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "This is the best kind of programming. No requirements document, no sprint planning, no pull request reviews. Just a text editor and a problem. The freedom to make terrible architectural decisions, rewrite everything twice, and follow tangents that turn out to be dead ends.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Why side projects matter",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Side projects are where you learn things your day job would never teach you. Not because the problems are harder, but because you're free to take risks. Try a language you've never used. Build something without a framework. Deploy to a platform you've only read about. The stakes are zero, which makes the learning maximum.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "By Sunday evening, the thing sort of works. It's rough, the error handling is nonexistent, and the README is a single sentence. But it solves the problem I set out to solve, and I learned three things I didn't know on Friday. Not a bad weekend.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["development"],
-					"tag": ["creativity"]
-				}
-			},
-			{
-				"id": "post-7",
-				"slug": "notes-on-simplicity",
-				"status": "published",
-				"data": {
-					"title": "Notes on Simplicity",
-					"excerpt": "Simplicity isn't the absence of complexity. It's the result of understanding a problem well enough to solve it cleanly.",
-					"featured_image": {
-						"$media": {
-							"url": "https://images.unsplash.com/photo-1559051668-e1fa58f25786?w=1200&h=800&fit=crop",
-							"alt": "Geometric pattern carved into white paper",
-							"filename": "notes-on-simplicity.jpg"
-						}
-					},
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Every piece of software starts simple. A few files, a clear purpose, a small surface area. Then features get added, edge cases get handled, and before long you're looking at something that requires a diagram to understand. This isn't inevitable, but it takes discipline to prevent.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The hard part of simplicity isn't the initial design. It's the ongoing resistance to complication. Every feature request, every bug fix, every refactor is an opportunity to add complexity. Saying no is the most important design skill, and the least celebrated.",
-									"_key": "k3"
-								}
-							],
-							"_key": "k2"
-						},
-						{
-							"_type": "block",
-							"style": "h2",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Removing as a feature",
-									"_key": "k5"
-								}
-							],
-							"_key": "k4"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "The best version of a product often has fewer features than the previous one. Not because features were missing, but because someone had the courage to remove things that weren't earning their keep. Every feature has a cost - in maintenance, in cognitive load, in the weight of the interface.",
-									"_key": "k7"
-								}
-							],
-							"_key": "k6"
-						},
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "Simplicity is a practice, not a destination. You never arrive at simple. You just keep asking: is this necessary? Could this be clearer? Is there a way to solve this problem by removing something instead of adding something? The answer is yes more often than you'd expect.",
-									"_key": "k9"
-								}
-							],
-							"_key": "k8"
-						}
-					]
-				},
-				"taxonomies": {
-					"category": ["notes"],
-					"tag": ["opinion"]
-				}
-			},
-			{
-				"id": "post-draft",
-				"slug": "work-in-progress",
-				"status": "draft",
-				"data": {
-					"title": "Work in Progress",
-					"excerpt": "This post is still being written.",
-					"content": [
-						{
-							"_type": "block",
-							"style": "normal",
-							"children": [
-								{
-									"_type": "span",
-									"text": "This is a draft post that won't appear in the public listing.",
-									"_key": "k1"
-								}
-							],
-							"_key": "k0"
-						}
+					"audience": [
+						"general"
+					],
+					"topic": [
+						"product"
 					]
 				}
 			}
