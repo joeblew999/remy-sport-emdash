@@ -1156,7 +1156,7 @@
 								{
 									"_type": "span",
 									"_key": "k106",
-									"text": "This website shows events and the organisations that run them. It does not show, store or link to anything that names a person.",
+									"text": "This website shows events and the organisations that run them. It does not show or store anything that names a person. Its buttons open the app, which has its own rules about who sees what.",
 									"marks": []
 								}
 							]
@@ -1679,7 +1679,7 @@
 								{
 									"_type": "span",
 									"_key": "k160",
-									"text": "The app is built for people who are signed in. This website is for everyone else: it says what the project is, and it will list events so that a search engine, or a link shared in a chat, shows something useful.",
+									"text": "The app is built for people who are signed in. This website is for everyone else: it says what the project is, and it has a page for each event and organisation in the app so that a search engine, or a link shared in a chat, shows something useful. While the app is being tested those pages show sample entries, and say so.",
 									"marks": []
 								}
 							]
