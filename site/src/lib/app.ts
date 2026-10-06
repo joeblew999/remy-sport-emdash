@@ -6,8 +6,7 @@
 // PRIVACY LINE — not negotiable.
 // This site shows EVENTS and ORGANISATIONS only. It must never fetch, store, render or link to
 // anything that names a person — players, rosters, coaches, parents, guardians — above all
-// children. The app's API answers more than that without credentials (team rosters with
-// children's names among it). That it answers is not permission. Never call a team, roster,
+// children. Whatever else the app's API would answer is not permission. Never call a team, roster,
 // player, people, game or standings endpoint from this site, and never add one to ALLOWED below.
 // A `noindex` tag is not a privacy control: such a page must not be rendered at all.
 //

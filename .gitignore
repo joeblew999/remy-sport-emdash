@@ -4,3 +4,4 @@ node_modules/
 .env
 /.claude/skills/
 mise.local.toml
+docs/private/
