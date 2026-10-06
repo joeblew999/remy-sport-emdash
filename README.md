@@ -61,6 +61,7 @@ the seed). An unset title shows the host name, so a missing setting is obvious.
 | `CANONICAL_URL`, else `DEPLOY_URL` | the environment of the build (`DEPLOY_URL` is in `mise.toml`) | The site's public address: `site:` in `astro.config.mjs`. Canonical links, the sitemap, `robots.txt`, RSS and share tags are all built from it, never from the host that answered. Unset, it is this machine. `astro dev` always uses this machine |
 | `APP_ORIGIN`, `HELP_ORIGIN` | `vars` in `site/wrangler.jsonc` | Where "Open the app" and "Help" go |
 | `APP_API_ORIGIN` | `site/.dev.vars` (gitignored), or `vars` | Which app the site reads: its events and organisations come from `<APP_API_ORIGIN>/api`. Defaults to `APP_ORIGIN`, which defaults to production. Point a local or preview site at the app's staging twin, which holds fixtures only |
+| `APP_DATA_IS_REAL` | `vars` in `site/wrangler.jsonc` | `"false"` today. The app's events are test entries: invented events under real schools' names. Until this is `"true"`, every event and organisation page shows a "Sample data" notice, carries `noindex`, and is left out of the sitemap. Set it to `"true"` when the app this site reads holds real events |
 | `SITE_PORT` | `mise.local.toml` (gitignored) | The local port, when 4321 is taken |
 
 ### Two languages
@@ -131,7 +132,7 @@ telling this site first.
 | operation | fields read |
 |---|---|
 | `GET /api/events` → `events[]` | `id`, `name`, `names.en`, `names.th`, `typeCode`, `formatCode`, `cityCode`, `startDate`, `endDate`, `orgId`, `venueNames.en/th`, `divisionNames[].en/th`, `updatedAt` |
-| `GET /api/events/{id}` | the same; a 404 is "no such event" |
+| `GET /api/events/{id}` | the same; a 404 is "no such event". The id must contain a digit (`evt_003`, a UUID) |
 | `GET /api/orgs` → `orgs[]` | `id`, `slug`, `names.en`, `names.th`, `orgTypeCode`, `cityCode` |
 | `GET /api/orgs/{id}` | the same; a 404 is "no such organisation" |
 
@@ -148,9 +149,19 @@ anything can render them, whatever the app adds later:
   `venueCount` — teams, games and followers are not this site's business.
 - Names in the app's other 25 languages, `provinceCode`, `timezone`, `isFibaCertified`, `createdAt`.
 - Never requested at all: an organisation's members, teams, rosters, players, coaches, games,
-  standings, `/api/me`, `/api/people`.
+  standings, `/api/me`, `/api/people`. The paths are checked before a request is made:
+  `/api/events` or `/api/orgs`, optionally followed by one id, and an id has a digit in it — so a
+  route word of the app's in that place (`/events/invitations` is the people invited to
+  co-organise) is a 404 here and is never sent. A redirect from the app is not followed.
 
-An event's and an organisation's own name is shown as the app has it.
+An event's, a venue's, a division's and an organisation's own name is shown as the app has it. If
+an organiser puts a person's name in one of those, it is shown: no filter can tell.
+
+The button on each page opens the app's own screen for that event or organisation. What the app
+shows there, and to whom, is the app's decision and is outside this site's privacy line.
+
+**Sample data.** See `APP_DATA_IS_REAL` above: until the app holds real events these pages are
+marked as sample data and kept away from search engines. That is about truth, not privacy.
 
 **Freshness.** A read is kept for five minutes (the Worker's Cache API), and a page for five
 minutes at the edge, so a change in the app shows here within about ten. The app has no way to
@@ -161,7 +172,7 @@ tell this site that something changed.
 - there is an earlier copy, up to a day old → the page is served from it, status 200;
 - there is none → status **503** with `Retry-After: 120`, `noindex`, not cached, and a page that
   says so plainly. Never a 404 and never an empty 200: both tell a search engine the page is gone;
-- the app answers 404 → this site answers **404**;
+- the app answers 404, 410 or 401 (sign-in required: not public) → this site answers **404**;
 - the sitemap lists everything else and is kept five minutes instead of an hour.
 
 The landing pages, the blog and the legal pages do not read the app and are not affected.
@@ -195,8 +206,11 @@ for block in re.findall(r'<script type=\"application/ld\+json\">(.*?)</script>',
     data = json.loads(block)
     print(data['@type'], '|', data['name'], '|', data.get('startDate', ''))"
 
-# 5. No such event is a 404; the pages are in the sitemap.
+# 5. No such event is a 404, and so is a word where an id belongs (it is never sent to the app).
 curl -s -o /dev/null -w '%{http_code}\n' $SITE/events/evt_999
+curl -s -o /dev/null -w '%{http_code}\n' $SITE/events/invitations
+
+# 6. The sitemap: 0 event pages while APP_DATA_IS_REAL is "false", one per event and language after.
 curl -s $SITE/sitemap.xml | grep -c '<loc>.*/events/'
 ```
 
@@ -217,7 +231,7 @@ page. Both need a deployed, public address.
   app's own unreviewed words.
 - Whether an event's free-text description may be shown (see "What is filtered").
 - Real events. Production holds the app's fixture events; a page per event is worth little until
-  the events are real.
+  the events are real. When they are, set `APP_DATA_IS_REAL` to `"true"` (above).
 - A share image and a favicon (Settings in the admin).
 - Whether posts carry a named author. None is seeded: the site names no person until that is decided.
 
