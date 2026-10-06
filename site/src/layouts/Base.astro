@@ -61,9 +61,10 @@ const metaDescription = description || siteTagline || null;
 
 // Canonical and share URLs come from `site` in astro.config.mjs, never from the host that
 // happened to answer. A page showing English under /th/ is a copy of the English page.
-// The 404 page has no address of its own, so it names none.
+// A page that is an error — the 404, or the 503 shown when the app does not answer — is not the
+// page at its address, so it names none.
 const canonical =
-	Astro.response.status === 404 ? null : absoluteUrl(Astro, localePath(path, isFallback ? DEFAULT_LOCALE : locale));
+	(Astro.response.status ?? 200) >= 400 ? null : absoluteUrl(Astro, localePath(path, isFallback ? DEFAULT_LOCALE : locale));
 const shareImage = image ? absoluteUrl(Astro, image) : (settings.seo?.defaultOgImage?.url ?? null);
 
 // Menu items are stored without a language prefix; the layout adds it. A stored URL is never
