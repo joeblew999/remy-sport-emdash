@@ -8,7 +8,7 @@
 
 import type { APIRoute } from "astro";
 
-import { DEFAULT_LOCALE, LOCALE_INFO } from "../i18n/ui";
+import { DEFAULT_LOCALE } from "../i18n/ui";
 import { appPages } from "../lib/entities";
 import { absoluteUrl, publicPages } from "../lib/site";
 import { escapeXml } from "../lib/xml";
@@ -27,7 +27,7 @@ export const GET: APIRoute = async (context) => {
 			if (lastmod) lines.push(`    <lastmod>${lastmod.toISOString()}</lastmod>`);
 			for (const other of versions) {
 				lines.push(
-					`    <xhtml:link rel="alternate" hreflang="${LOCALE_INFO[other.locale].htmlLang}" href="${url(other.path)}"/>`,
+					`    <xhtml:link rel="alternate" hreflang="${other.locale}" href="${url(other.path)}"/>`,
 				);
 			}
 			lines.push(`    <xhtml:link rel="alternate" hreflang="x-default" href="${url(fallback.path)}"/>`, "  </url>");

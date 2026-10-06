@@ -6,7 +6,8 @@ import { sanitizeHref } from "emdash";
 import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import { Font } from "astro:assets";
-import { DEFAULT_LOCALE, LOCALES, LOCALE_INFO, t, type Locale } from "../i18n/ui";
+import LanguageSwitcher from "../components/LanguageSwitcher.astro";
+import { DEFAULT_LOCALE, directionOf, t, type Locale } from "../i18n/ui";
 import { appHref, helpHref } from "../lib/app";
 import { absoluteUrl, identity, localeOf, localePath, neutralPath, type Shell } from "../lib/site";
 import "../styles/tokens.css";
@@ -25,7 +26,7 @@ interface Props {
 	modifiedTime?: string | null;
 	/** The EmDash entry this page renders: turns on the SEO panel overlay and hreflang. */
 	content?: { collection: string; id: string; slug?: string | null };
-	/** The text shown is English although the URL is not: say so, and point the canonical at English. */
+	/** The text shown is English although the address is in another language: say so, and point the canonical at English. */
 	isFallback?: boolean;
 	/** For a page with no entry (the blog index): the languages it really exists in. */
 	languages?: readonly Locale[];
@@ -60,7 +61,7 @@ const fullTitle = title ? `${title} — ${siteTitle}` : siteTagline ? `${siteTit
 const metaDescription = description || siteTagline || null;
 
 // Canonical and share URLs come from `site` in astro.config.mjs, never from the host that
-// happened to answer. A page showing English under /th/ is a copy of the English page.
+// happened to answer. A page showing English under /th/ or /ja/ is a copy of the English page.
 // A page that is an error — the 404, or the 503 shown when the app does not answer — is not the
 // page at its address, so it names none.
 const canonical =
@@ -77,7 +78,7 @@ const alternates =
 	content || noindex || !languages
 		? []
 		: [
-				...languages.map((l) => ({ hreflang: LOCALE_INFO[l].htmlLang, path: localePath(path, l) })),
+				...languages.map((l) => ({ hreflang: l, path: localePath(path, l) })),
 				{ hreflang: "x-default", path: localePath(path, DEFAULT_LOCALE) },
 			];
 
@@ -103,7 +104,7 @@ const isLoggedIn = Boolean(Astro.locals.user);
 ---
 
 <!doctype html>
-<html lang={LOCALE_INFO[locale].htmlLang}>
+<html lang={locale} dir={directionOf(locale)}>
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -167,12 +168,12 @@ const isLoggedIn = Boolean(Astro.locals.user);
 		<main id="main">
 			{
 				isFallback && (
-					<p class="notice" lang={LOCALE_INFO[locale].htmlLang}>
+					<p class="notice" lang={DEFAULT_LOCALE} dir="ltr">
 						{t(locale, "notTranslated")}
 					</p>
 				)
 			}
-			<div lang={isFallback ? LOCALE_INFO[DEFAULT_LOCALE].htmlLang : undefined}>
+			<div lang={isFallback ? DEFAULT_LOCALE : undefined} dir={isFallback ? "ltr" : undefined}>
 				<slot />
 			</div>
 		</main>
@@ -197,24 +198,7 @@ const isLoggedIn = Boolean(Astro.locals.user);
 					</ul>
 				</nav>
 				<div class="footer-tools">
-					<nav aria-label={t(locale, "language")}>
-						<ul class="lang-switch">
-							{
-								LOCALES.map((l) => (
-									<li>
-										<a
-											href={localePath(path, l)}
-											hreflang={LOCALE_INFO[l].htmlLang}
-											lang={LOCALE_INFO[l].htmlLang}
-											aria-current={l === locale ? "true" : undefined}
-										>
-											{LOCALE_INFO[l].label}
-										</a>
-									</li>
-								))
-							}
-						</ul>
-					</nav>
+					<LanguageSwitcher content={content} />
 					<div class="theme-switch" role="group" aria-label={t(locale, "theme")}>
 						<button type="button" data-theme="light">{t(locale, "themeLight")}</button>
 						<button type="button" data-theme="dark">{t(locale, "themeDark")}</button>
@@ -386,17 +370,6 @@ const isLoggedIn = Boolean(Astro.locals.user);
 		display: grid;
 		gap: var(--spacing-4);
 		align-content: start;
-	}
-
-	.lang-switch {
-		grid-auto-flow: column;
-		justify-content: start;
-		gap: var(--spacing-4) !important;
-	}
-
-	.lang-switch a[aria-current] {
-		color: var(--color-text);
-		font-weight: 600;
 	}
 
 	.theme-switch {

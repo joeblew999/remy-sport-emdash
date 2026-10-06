@@ -22,6 +22,8 @@ const facts = [
 	{ label: t(locale, "eventCity"), value: codeLabel(event.cityCode) },
 	{ label: t(locale, "eventFormat"), value: event.formatCode },
 ].filter((fact) => fact.value);
+// "Organised by {name}", in the app's words for this language: the name is a link to the organisation.
+const organisedBy = t(locale, "eventOrganiser").split("{name}");
 ---
 
 <article class="narrow">
@@ -41,16 +43,6 @@ const facts = [
 			))
 		}
 		{
-			org && (
-				<div>
-					<dt>{t(locale, "eventOrganiser")}</dt>
-					<dd>
-						<a href={localePath(orgPath(org), locale)}>{nameIn(org.names, locale)}</a>
-					</dd>
-				</div>
-			)
-		}
-		{
 			event.divisionNames.length > 0 && (
 				<div>
 					<dt>{t(locale, "eventDivisions")}</dt>
@@ -59,6 +51,15 @@ const facts = [
 			)
 		}
 	</dl>
+	{
+		org && (
+			<p class="organiser">
+				{organisedBy[0]}
+				<a href={localePath(orgPath(org), locale)}>{nameIn(org.names, locale)}</a>
+				{organisedBy[1]}
+			</p>
+		)
+	}
 
 	<div class="cta-row">
 		<a class="btn btn-primary" href={appHref({ page: "event", id: event.id }, "event")}>
@@ -83,6 +84,11 @@ const facts = [
 
 	.facts dd {
 		margin: 0;
+		font-size: var(--font-size-lg);
+	}
+
+	.organiser {
+		margin: calc(-1 * var(--spacing-4)) 0 var(--spacing-8);
 		font-size: var(--font-size-lg);
 	}
 

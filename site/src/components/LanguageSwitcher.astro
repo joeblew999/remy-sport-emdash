@@ -1,0 +1,71 @@
+---
+// The language switch: every language the site answers in, each by its own name, each linking to
+// this same page in that language. Built the way EmDash's internationalisation guide shows: for
+// a page that is an entry, `getTranslations` says which languages it is published in and under
+// which slug. A language with no published translation still gets a link — the address answers
+// with the English text and a notice — so the switch never leads to a 404.
+import { getTranslations } from "emdash";
+import { DEFAULT_LOCALE, languageName, LOCALES, t } from "../i18n/ui";
+import { localeOf, localePath, neutralPath } from "../lib/site";
+
+interface Props {
+	/** The EmDash entry on this page, when it is one. */
+	content?: { collection: string; id: string };
+}
+
+const { content } = Astro.props;
+const locale = localeOf(Astro);
+const path = neutralPath(Astro.url.pathname);
+
+// The slug of each published translation: a translation may have a slug of its own.
+const slugs = new Map<string, string>();
+if (content) {
+	const { translations } = await getTranslations(content.collection, content.id);
+	for (const translation of translations) {
+		if (translation.status === "published" && translation.slug) slugs.set(translation.locale, translation.slug);
+	}
+}
+const ownSlug = slugs.get(locale) ?? slugs.get(DEFAULT_LOCALE);
+const pathIn = (other: string) => {
+	const slug = slugs.get(other);
+	// Only the last segment of an entry's address is its slug: "/blog/<slug>", "/<slug>".
+	if (!slug || !ownSlug || !path.endsWith(`/${ownSlug}`)) return localePath(path, other);
+	return localePath(`${path.slice(0, -ownSlug.length)}${slug}`, other);
+};
+---
+
+<nav aria-label={t(locale, "language")}>
+	<ul class="lang-switch">
+		{
+			LOCALES.map((other) => (
+				<li>
+					<a href={pathIn(other)} hreflang={other} lang={other} aria-current={other === locale ? "true" : undefined}>
+						{languageName(other)}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</nav>
+
+<style>
+	.lang-switch {
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-1) var(--spacing-4);
+	}
+
+	.lang-switch a {
+		color: var(--color-text-secondary);
+	}
+
+	.lang-switch a:hover {
+		color: var(--color-text);
+	}
+
+	.lang-switch a[aria-current] {
+		color: var(--color-text);
+		font-weight: 600;
+	}
+</style>

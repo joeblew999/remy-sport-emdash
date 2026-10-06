@@ -9,6 +9,7 @@ import {
 	getMenuWithCacheHint,
 	getSiteSettingsWithCacheHint,
 	getTaxonomyTermsWithCacheHint,
+	getTranslations,
 } from "emdash";
 
 import { DEFAULT_LOCALE, isLocale, LOCALES, type Locale } from "../i18n/ui";
@@ -21,12 +22,23 @@ export const HOME_SLUG = "home";
 export const AUDIENCE_SLUGS = ["organisers", "coaches", "parents"];
 
 /**
- * The language of a request, from the address the visitor asked for: "/th/…" is Thai, anything
- * else is English. The original path, so the 404 page (a rewrite) keeps the visitor's language.
+ * The language of a request, from the address the visitor asked for: "/th/…" is Thai, "/ja/…"
+ * Japanese, and an address with no language in front is English. The original path, so the 404
+ * page (a rewrite) keeps the visitor's language.
  */
 export function localeOf(Astro: Pick<AstroGlobal, "originPathname" | "url">): Locale {
 	const first = (Astro.originPathname || Astro.url.pathname).split("/")[1];
 	return isLocale(first) ? first : DEFAULT_LOCALE;
+}
+
+/**
+ * Is the `[...locale]` in front of a route really a language? Every route under
+ * `src/pages/[...locale]/` asks this first, because that segment matches anything: nothing
+ * (English), "th", but also "xx" or "a/b". English has no prefix, so "/en/blog" is not an
+ * address either. False is a 404.
+ */
+export function isLocalePrefix(prefix: string | undefined): boolean {
+	return prefix === undefined || (isLocale(prefix) && prefix !== DEFAULT_LOCALE);
 }
 
 /** A site path in a language: ("/blog", "th") → "/th/blog"; ("/", "th") → "/th/". */
@@ -142,10 +154,23 @@ export async function loadPosts(Astro: Ctx, options: { limit: number; where?: Po
 	return { posts: result.entries, isFallback };
 }
 
-/** The languages that have at least one published post. */
+/**
+ * The languages the site is published in: those with a published home page. English, plus each
+ * language an editor has published the home page in. This is what the sitemap and the blog
+ * index go by — one question to the database, however many languages are configured.
+ */
+export async function publishedLanguages(): Promise<Locale[]> {
+	const { translations, error } = await getTranslations("pages", HOME_SLUG);
+	if (error) console.error("[site] home translations:", error.message);
+	const published = new Set(translations.filter((version) => version.status === "published").map((version) => version.locale));
+	published.add(DEFAULT_LOCALE);
+	return LOCALES.filter((locale) => published.has(locale));
+}
+
+/** The published languages that have at least one published post. */
 async function postLanguages(Astro: Ctx): Promise<Locale[]> {
 	const found = await Promise.all(
-		LOCALES.map(async (locale) => {
+		(await publishedLanguages()).map(async (locale) => {
 			const { entries, cacheHint } = await getEmDashCollection("posts", { locale, status: "published", limit: 1 });
 			report(Astro, cacheHint);
 			return entries.length > 0 ? locale : null;
@@ -156,19 +181,19 @@ async function postLanguages(Astro: Ctx): Promise<Locale[]> {
 
 /** Everything the landing page shows. Null when there is no home entry at all. */
 export async function loadHome(Astro: Ctx) {
-	const [inEachLanguage, audiencePages, { posts }] = await Promise.all([
-		Promise.all(LOCALES.map((locale) => loadEntry(Astro, "pages", HOME_SLUG, locale))),
+	const [home, languages, audiencePages, { posts }] = await Promise.all([
+		loadEntry(Astro, "pages", HOME_SLUG),
+		publishedLanguages(),
 		Promise.all(AUDIENCE_SLUGS.map((slug) => loadEntry(Astro, "pages", slug))),
 		loadPosts(Astro, { limit: 3 }),
 	]);
-	const home = inEachLanguage[LOCALES.indexOf(localeOf(Astro))];
 	if (!home) return null;
 	return {
 		home,
 		audiences: audiencePages.flatMap((found) => (found ? [found.entry] : [])),
 		posts,
 		// The languages the home page is really written in — what hreflang may claim.
-		languages: LOCALES.filter((_, i) => inEachLanguage[i] && !inEachLanguage[i].isFallback),
+		languages,
 	};
 }
 
@@ -209,7 +234,9 @@ export async function publicPages(): Promise<{ lastmod?: Date; versions: { local
 		if (updated && (!group.lastmod || updated > group.lastmod)) group.lastmod = updated;
 		groups.set(key, group);
 	};
-	for (const locale of LOCALES) {
+	// Only the languages the site is published in are asked about: a language with no home page
+	// of its own has nothing of its own to list, and asking all of them is two queries each.
+	for (const locale of await publishedLanguages()) {
 		const [pages, posts] = await Promise.all([
 			getEmDashCollection("pages", { locale, status: "published", limit: 1000 }),
 			getEmDashCollection("posts", { locale, status: "published", limit: 1000 }),

@@ -1,0 +1,53 @@
+---
+// The `pages` collection, in every language: "/" and "/<slug>" in English, "/<code>/" and
+// "/<code>/<slug>" in the others. "/" is the `home` entry (views/HomeView.astro); a slug is an
+// editor-written page — organisers, coaches, parents, about, privacy, terms, and any page an
+// editor adds later (views/PageView.astro). Anything else that reaches here is a 404.
+import { decodeSlug } from "emdash";
+import Base from "../layouts/Base.astro";
+import { DEFAULT_LOCALE, isLocale } from "../i18n/ui";
+import { HOME_SLUG, loadEntry, loadHome, loadShell, localeOf, localePath } from "../lib/site";
+import HomeView from "../views/HomeView.astro";
+import PageView from "../views/PageView.astro";
+
+// "" → home in English; "th" → home in Thai; "about" → a page; "th/about" → that page in Thai.
+const segments = (Astro.params.path ?? "").split("/").filter(Boolean);
+const hasPrefix = isLocale(segments[0]) && segments[0] !== DEFAULT_LOCALE;
+const rest = hasPrefix ? segments.slice(1) : segments;
+if (rest.length > 1) return Astro.rewrite("/404");
+
+let slug: string | null = null;
+try {
+	slug = rest[0] ? decodeSlug(rest[0]) || null : HOME_SLUG;
+} catch {
+	// "/%25": not a slug at all.
+}
+if (!slug) return Astro.rewrite("/404");
+// The home entry is rendered at "/", and only there.
+if (rest[0] && slug === HOME_SLUG) return Astro.redirect(localePath("/", localeOf(Astro)), 301);
+
+const home = slug === HOME_SLUG ? await loadHome(Astro) : null;
+const found = home ? home.home : await loadEntry(Astro, "pages", slug);
+if (!found) return Astro.rewrite("/404");
+const { entry: page, isFallback } = found;
+const shell = await loadShell(Astro);
+---
+
+{
+	home ? (
+		<Base shell={shell} description={page.data.summary} isFallback={isFallback} languages={home.languages}>
+			<HomeView home={page} audiences={home.audiences} posts={home.posts} />
+		</Base>
+	) : (
+		<Base
+			shell={shell}
+			title={page.data.title}
+			description={page.data.summary}
+			content={{ collection: "pages", id: page.data.id, slug: page.id }}
+			isFallback={isFallback}
+			noindex={Boolean(page.data.placeholder)}
+		>
+			<PageView page={page} />
+		</Base>
+	)
+}

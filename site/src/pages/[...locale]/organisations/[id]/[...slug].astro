@@ -1,0 +1,44 @@
+---
+// "/organisations/<id>/<slug>" — one organisation, from the app's `GET /api/orgs/<id>`. The id
+// is what is looked up; "/organisations/<id>" and a stale slug redirect to the current address.
+import AppUnavailable from "../../../../components/AppUnavailable.astro";
+import { APP_DATA_IS_REAL } from "../../../../lib/app";
+import Base from "../../../../layouts/Base.astro";
+import { t } from "../../../../i18n/ui";
+import {
+	codeLabel,
+	languagesOf,
+	loadOrgPage,
+	markUnavailable,
+	nameIn,
+	organizationJsonLd,
+} from "../../../../lib/entities";
+import { isLocalePrefix, loadShell, localeOf } from "../../../../lib/site";
+import OrgView from "../../../../views/OrgView.astro";
+
+if (!isLocalePrefix(Astro.params.locale)) return Astro.rewrite("/404");
+
+const locale = localeOf(Astro);
+const found = await loadOrgPage(Astro);
+if (found.kind === "missing") return Astro.rewrite("/404");
+if (found.kind === "moved") return Astro.redirect(found.to, 301);
+if (found.kind === "unavailable") markUnavailable(Astro);
+const shell = await loadShell(Astro, { cacheable: found.kind === "ok" });
+
+const org = found.kind === "ok" ? found.org : null;
+const languages = org ? languagesOf(org.names) : [];
+// The description is the organisation's facts on one line: what kind, and where.
+const description = org ? [codeLabel(org.orgTypeCode), codeLabel(org.cityCode)].filter(Boolean).join(" · ") : null;
+---
+
+<Base
+	shell={shell}
+	title={org ? nameIn(org.names, locale) : t(locale, "appDownTitle")}
+	description={description}
+	languages={languages}
+	isFallback={Boolean(org) && !languages.includes(locale)}
+	noindex={!org || !APP_DATA_IS_REAL}
+	jsonLd={org ? organizationJsonLd(Astro, org, locale) : undefined}
+>
+	{org ? <OrgView org={org} events={found.kind === "ok" ? found.events : []} /> : <AppUnavailable />}
+</Base>

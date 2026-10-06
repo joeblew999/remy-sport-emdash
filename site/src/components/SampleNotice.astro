@@ -2,11 +2,24 @@
 // Shown on every event and organisation page until the app's data is real (APP_DATA_IS_REAL in
 // wrangler.jsonc). The app is tested with invented events under real schools' names; a page that
 // showed them without saying so would be stating something false about those schools.
-import { t } from "../i18n/ui";
+import { DEFAULT_LOCALE, hasLabel, t } from "../i18n/ui";
 import { APP_DATA_IS_REAL } from "../lib/app";
 import { localeOf } from "../lib/site";
 
 const locale = localeOf(Astro);
 ---
 
-{!APP_DATA_IS_REAL && <p class="placeholder-banner">{t(locale, "sampleData")}</p>}
+{
+	!APP_DATA_IS_REAL && (
+		<p class="placeholder-banner">
+			<strong class="label">{t(locale, "sampleData")}</strong>
+			<span lang={hasLabel(locale, "sampleDataNote") ? undefined : DEFAULT_LOCALE}>{t(locale, "sampleDataNote")}</span>
+		</p>
+	)
+}
+
+<style>
+	.label {
+		display: block;
+	}
+</style>

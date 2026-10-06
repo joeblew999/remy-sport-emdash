@@ -1,0 +1,49 @@
+---
+// "/events/<id>/<slug>" — one event, from the app's `GET /api/events/<id>`. The id is what is
+// looked up; "/events/<id>" and a stale slug redirect to the address with the current one.
+import AppUnavailable from "../../../../components/AppUnavailable.astro";
+import { APP_DATA_IS_REAL } from "../../../../lib/app";
+import Base from "../../../../layouts/Base.astro";
+import { t } from "../../../../i18n/ui";
+import {
+	codeLabel,
+	dateRange,
+	languagesOf,
+	loadEventPage,
+	markUnavailable,
+	nameIn,
+	placeLabel,
+	sportsEventJsonLd,
+} from "../../../../lib/entities";
+import { isLocalePrefix, loadShell, localeOf } from "../../../../lib/site";
+import EventView from "../../../../views/EventView.astro";
+
+if (!isLocalePrefix(Astro.params.locale)) return Astro.rewrite("/404");
+
+const locale = localeOf(Astro);
+const found = await loadEventPage(Astro);
+if (found.kind === "missing") return Astro.rewrite("/404");
+if (found.kind === "moved") return Astro.redirect(found.to, 301);
+if (found.kind === "unavailable") markUnavailable(Astro);
+const shell = await loadShell(Astro, { cacheable: found.kind === "ok" });
+
+const event = found.kind === "ok" ? found.event : null;
+const org = found.kind === "ok" ? found.org : null;
+const languages = event ? languagesOf(event.names) : [];
+// The description is the event's facts on one line: type, dates, place.
+const description = event
+	? [codeLabel(event.typeCode), dateRange(locale, event), placeLabel(locale, event)].filter(Boolean).join(" · ")
+	: null;
+---
+
+<Base
+	shell={shell}
+	title={event ? nameIn(event.names, locale) : t(locale, "appDownTitle")}
+	description={description}
+	languages={languages}
+	isFallback={Boolean(event) && !languages.includes(locale)}
+	noindex={!event || !APP_DATA_IS_REAL}
+	jsonLd={event ? sportsEventJsonLd(Astro, event, org, locale) : undefined}
+>
+	{event ? <EventView event={event} org={org} /> : <AppUnavailable />}
+</Base>

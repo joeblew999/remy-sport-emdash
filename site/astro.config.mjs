@@ -13,19 +13,36 @@ const localUrl = `http://localhost:${process.env.SITE_PORT || 4321}`;
 const publicUrl = (!isDev && (process.env.CANONICAL_URL || process.env.DEPLOY_URL)) || "";
 const site = publicUrl || localUrl;
 
-// English is the default and has no prefix (a prefixed default locale 404s the EmDash admin);
-// Thai is under /th/. Keep in step with `defaultLocale` in seed/seed.json and src/i18n/ui.ts.
-export const locales = ["en", "th"];
+// THE LANGUAGES. This is the one list: Astro and EmDash are both configured from it, and the
+// site's own code reads it back (src/i18n/ui.ts, through `astro:config/server`). It is the app's
+// list — `locales` in the app's project.inlang/settings.json — so the site and the app speak the
+// same languages under the same codes. English is the default and has no prefix (a prefixed
+// default locale 404s the EmDash admin); every other language is under /<code>/.
+const defaultLocale = "en";
+const locales = [
+	"en", "th", "ja", "zh", "es", "pt", "id", "fr", "tl", "vi", "ko", "de", "ru", "tr",
+	"it", "pl", "uk", "hi", "ar", "ms", "bn", "zh-TW", "zh-HK", "ur", "fa", "sw", "nl",
+];
+// Every other language falls back to English. (`any`: Astro types `fallback` from a literal list
+// of locales, and this one is computed.)
+const fallback = /** @type {any} */ (
+	Object.fromEntries(locales.filter((l) => l !== defaultLocale).map((l) => [l, defaultLocale]))
+);
 
 export default defineConfig({
 	site,
 	output: "server",
 	adapter: cloudflare(),
 	i18n: {
-		defaultLocale: "en",
+		defaultLocale,
 		locales,
-		// No `fallback`: every Thai route exists (src/pages/th/), and EmDash itself falls back to
-		// the English entry when a page has no published Thai version.
+		// EmDash's fallback chain: an entry with no published translation is served in English.
+		fallback,
+		// One set of routes serves every language: src/pages/[...locale]/ takes the language from
+		// the address, and nothing is redirected or rewritten on the way. "manual" keeps Astro's
+		// own fallback out of it — tried first, it answered /about/fr with the About page and
+		// served the admin a second time under every language prefix.
+		routing: "manual",
 	},
 	// Edge cache: pages report what they read (Astro.cache.set), EmDash purges by tag on publish.
 	// Cloudflare only — in dev there is no cache in front of the Worker.

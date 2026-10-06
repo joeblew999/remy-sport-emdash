@@ -1,125 +1,81 @@
 // The words the templates print themselves (buttons, labels, notices). Page and post text is
-// content, edited in the admin. Locales here must match `i18n.locales` in astro.config.mjs.
+// content, edited in the admin.
 //
-// THAI IS NOT REVIEWED. The `th` strings are plain interface words written without a native
-// speaker. Have one review them before the Thai site is announced; a missing key falls back to
-// English.
+// WHICH LANGUAGES: `i18n.locales` in astro.config.mjs, read back here. Nothing in this file lists
+// them again.
+//
+// THE WORDS: messages/<code>.json, one file per language.
+//   - en.json holds every label. It is the fallback: a label a language does not have is shown
+//     in English.
+//   - Every other file holds only the labels the app already had in that language. They were
+//     copied once, by key, from the app's own message catalogues (messages/<code>.json in the
+//     app's repo, which is private — so the site carries a copy and cannot read it at build time):
+//
+//       language ← language            eventsTitle, orgEvents ← events   orgsTitle ← orgs_heading
+//       eventsPast ← status_finished   noEvents, orgNoEvents ← no_events_yet   noOrgs ← orgs_empty
+//       eventDatesUnknown ← dates_tbc  eventVenue ← venue                eventCity ← event_city
+//       eventFormat ← format           eventDivisions ← event_divisions  eventOrganiser ← organised_by
+//       sampleData ← sample_data       filterAll ← tab_all               notFoundBody ← route_not_found
+//       theme, themeLight, themeDark, themeSystem ← theme, theme_light, theme_dark, theme_system
+//
+//     `_language` (the language's own name) and `_direction` are the app's `endonym` and
+//     `direction` for that language.
+//   - Nothing else is translated here. A label the app does not have stays English until a
+//     person who reads the language writes it into that language's file. Do not machine-translate
+//     into these files.
 
-export const DEFAULT_LOCALE = "en";
-export const LOCALES = ["en", "th"] as const;
-export type Locale = (typeof LOCALES)[number];
+import { i18n } from "astro:config/server";
 
-/** What a reader sees in the language switch, and what `lang=` and feeds are told. */
-export const LOCALE_INFO: Record<Locale, { label: string; htmlLang: string; dateLocale: string }> = {
-	en: { label: "English", htmlLang: "en", dateLocale: "en-GB" },
-	th: { label: "ไทย", htmlLang: "th", dateLocale: "th-TH" },
-};
+/** Every label there is: the keys of en.json. */
+import en from "./messages/en.json";
 
-const en = {
-	skipToContent: "Skip to content",
-	openApp: "Open the app",
-	help: "Help",
-	rss: "RSS feed",
-	language: "Language",
-	primaryNav: "Main",
-	footerNav: "Site",
-	whoItIsFor: "Who it is for",
-	readMore: "Read more",
-	latestPosts: "From the blog",
-	allPosts: "All posts",
-	blogTitle: "Blog",
-	blogDescription: "Guides to basketball events in Thailand, and news about the product.",
-	noPosts: "Nothing has been published yet.",
-	filterAll: "All",
-	filterAudience: "For",
-	filterTopic: "About",
-	minRead: "min read",
-	published: "Published",
-	updated: "Updated",
-	backToBlog: "Back to the blog",
-	notTranslated: "This page is not available in Thai yet. You are reading the English version.",
-	placeholder:
-		"Draft. This page is a placeholder and has no legal effect. The owner's text has not been written yet.",
-	notFoundTitle: "Page not found",
-	notFoundBody: "There is nothing at this address.",
-	goHome: "Go to the home page",
-	// Event and organisation pages. The names on them are the app's, in both languages; these
-	// labels around them have no Thai yet and show in English on /th/ until a native speaker
-	// writes them.
-	eventsTitle: "Events",
-	eventsDescription: "Basketball events listed in the app: what each one is, when, and where.",
-	eventsUpcoming: "Upcoming and under way",
-	eventsPast: "Finished",
-	noEvents: "No events are listed yet.",
-	orgsTitle: "Organisations",
-	orgsDescription: "The schools, clubs and federations listed in the app.",
-	noOrgs: "No organisations are listed yet.",
-	eventWhen: "Dates",
-	eventDatesUnknown: "Dates not announced",
-	eventVenue: "Venue",
-	eventCity: "City",
-	eventType: "Type",
-	eventFormat: "Format",
-	eventDivisions: "Divisions",
-	eventOrganiser: "Organised by",
-	orgType: "Type",
-	orgEvents: "Events it organises",
-	orgNoEvents: "No events are listed for this organisation.",
-	openEventInApp: "Open this event in the app",
-	openOrgInApp: "Open this organisation in the app",
-	inAppNote: "Schedules, results and following an event are in the app.",
-	allEvents: "All events",
-	allOrgs: "All organisations",
-	sampleData:
-		"Sample data. The app is still being tested, and the events and organisations it lists are test entries. These events are not real.",
-	appDownTitle: "This page is not available right now",
-	appDownBody:
-		"Events and organisations are read from the app, and the app did not answer. Nothing has been removed. Please try again in a few minutes.",
-	theme: "Theme",
-	themeLight: "Light",
-	themeDark: "Dark",
-	themeSystem: "Match my device",
-};
+export type Locale = string;
+type Messages = Partial<Record<Key, string>> & { _language?: string; _direction?: string };
+type Key = Exclude<keyof typeof en, "_language" | "_direction">;
 
-type Key = keyof typeof en;
+if (!i18n) throw new Error("astro.config.mjs has no i18n block: the site has no languages");
 
-const th: Partial<Record<Key, string>> = {
-	skipToContent: "ข้ามไปยังเนื้อหา",
-	openApp: "เปิดแอป",
-	help: "ช่วยเหลือ",
-	rss: "ฟีด RSS",
-	language: "ภาษา",
-	primaryNav: "เมนูหลัก",
-	footerNav: "เว็บไซต์",
-	whoItIsFor: "สำหรับใคร",
-	readMore: "อ่านต่อ",
-	latestPosts: "จากบล็อก",
-	allPosts: "โพสต์ทั้งหมด",
-	blogTitle: "บล็อก",
-	noPosts: "ยังไม่มีโพสต์",
-	filterAll: "ทั้งหมด",
-	published: "เผยแพร่เมื่อ",
-	updated: "อัปเดตเมื่อ",
-	backToBlog: "กลับไปที่บล็อก",
-	notTranslated: "หน้านี้ยังไม่มีภาษาไทย คุณกำลังอ่านฉบับภาษาอังกฤษ",
-	notFoundTitle: "ไม่พบหน้านี้",
-	goHome: "ไปที่หน้าแรก",
-};
+export const DEFAULT_LOCALE: Locale = i18n.defaultLocale;
+/** The languages the site answers in, default first: `i18n.locales` in astro.config.mjs. */
+export const LOCALES: readonly Locale[] = i18n.locales.map((locale) => (typeof locale === "string" ? locale : locale.path));
 
-const dictionaries: Record<Locale, Partial<Record<Key, string>>> = { en, th };
+const files = import.meta.glob<Messages>("./messages/*.json", { eager: true, import: "default" });
+const dictionaries = new Map<Locale, Messages>(
+	Object.entries(files).map(([path, messages]) => [path.slice(path.lastIndexOf("/") + 1, -".json".length), messages]),
+);
 
 export function isLocale(value: string | undefined): value is Locale {
-	return LOCALES.includes(value as Locale);
+	return value !== undefined && LOCALES.includes(value);
 }
 
 /** The interface string for `key`, in `locale` when it has one, in English when it does not. */
 export function t(locale: Locale, key: Key): string {
-	return dictionaries[locale][key] ?? en[key];
+	return dictionaries.get(locale)?.[key] ?? en[key];
+}
+
+/** Does `locale` have its own word for `key`, or is `t` handing back the English? */
+export function hasLabel(locale: Locale, key: Key): boolean {
+	return locale === DEFAULT_LOCALE || Boolean(dictionaries.get(locale)?.[key]);
+}
+
+/** A language's name in that language — what the language switch shows. The code when unknown. */
+export function languageName(locale: Locale): string {
+	return dictionaries.get(locale)?._language ?? locale;
+}
+
+/** "rtl" for a language written right to left (Arabic, Persian, Urdu); "ltr" for the rest. */
+export function directionOf(locale: Locale): "ltr" | "rtl" {
+	return dictionaries.get(locale)?._direction === "rtl" ? "rtl" : "ltr";
+}
+
+/** What `Intl` is asked to format dates in. English dates are written day first. */
+export function dateLocale(locale: Locale): string {
+	return locale === "en" ? "en-GB" : locale;
 }
 
 export function formatDate(locale: Locale, date: Date | null | undefined): string | null {
 	if (!date) return null;
-	return date.toLocaleDateString(LOCALE_INFO[locale].dateLocale, {
+	return date.toLocaleDateString(dateLocale(locale), {
 		year: "numeric",
 		month: "long",
 		day: "numeric",

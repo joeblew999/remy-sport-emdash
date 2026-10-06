@@ -1,0 +1,24 @@
+---
+// "/blog" — every published post, newest first. ?audience=<term> or ?topic=<term> narrows it.
+import Base from "../../../layouts/Base.astro";
+import { t } from "../../../i18n/ui";
+import { isLocalePrefix, loadBlogIndex, loadShell, localeOf } from "../../../lib/site";
+import BlogIndexView from "../../../views/BlogIndexView.astro";
+
+if (!isLocalePrefix(Astro.params.locale)) return Astro.rewrite("/404");
+
+const locale = localeOf(Astro);
+const data = await loadBlogIndex(Astro);
+const shell = await loadShell(Astro);
+---
+
+<Base
+	shell={shell}
+	title={t(locale, "blogTitle")}
+	description={t(locale, "blogDescription")}
+	isFallback={data.isFallback}
+	languages={data.languages}
+	noindex={data.isFiltered}
+>
+	<BlogIndexView posts={data.posts} audiences={data.audiences} topics={data.topics} active={data.active} />
+</Base>

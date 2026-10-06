@@ -1,14 +1,15 @@
-// The blog's RSS feed, one per language: /rss.xml and /th/rss.xml. A language with no posts of
+// The blog's RSS feed, one per language: /rss.xml, /th/rss.xml, /ja/rss.xml, …. A language with no posts of
 // its own serves the English posts, as its blog index does, and links to their English addresses.
 
 import type { APIRoute } from "astro";
 import { getSiteSettingsWithCacheHint } from "emdash";
 
-import { DEFAULT_LOCALE, LOCALE_INFO } from "../i18n/ui";
-import { absoluteUrl, identity, loadPosts, localeOf, localePath } from "./site";
+import { DEFAULT_LOCALE } from "../i18n/ui";
+import { absoluteUrl, identity, isLocalePrefix, loadPosts, localeOf, localePath } from "./site";
 import { escapeXml } from "./xml";
 
 export const GET: APIRoute = async (context) => {
+	if (!isLocalePrefix(context.params.locale)) return new Response("Not found\n", { status: 404 });
 	const locale = localeOf(context);
 	const [settings, { posts, isFallback }] = await Promise.all([
 		getSiteSettingsWithCacheHint(),
@@ -41,7 +42,7 @@ export const GET: APIRoute = async (context) => {
 		`    <description>${escapeXml(siteTagline)}</description>`,
 		`    <link>${escapeXml(absoluteUrl(context, localePath("/blog", locale)))}</link>`,
 		`    <atom:link href="${escapeXml(absoluteUrl(context, localePath("/rss.xml", locale)))}" rel="self" type="application/rss+xml"/>`,
-		`    <language>${LOCALE_INFO[postLocale].htmlLang}</language>`,
+		`    <language>${postLocale}</language>`,
 		...items,
 		"  </channel>",
 		"</rss>",

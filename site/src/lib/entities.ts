@@ -4,7 +4,7 @@
 
 import type { AstroGlobal } from "astro";
 
-import { DEFAULT_LOCALE, LOCALE_INFO, LOCALES, type Locale } from "../i18n/ui";
+import { dateLocale, DEFAULT_LOCALE, LOCALES, type Locale } from "../i18n/ui";
 import { APP_DATA_IS_REAL, getEvent, getOrg, listEvents, listOrgs, type Names, type PublicEvent, type PublicOrg } from "./app";
 import { absoluteUrl, localeOf, localePath } from "./site";
 
@@ -12,14 +12,18 @@ type Ctx = Pick<AstroGlobal, "originPathname" | "site" | "url" | "params">;
 
 // ── Names, codes and dates ──────────────────────────────────────────────────────────────────
 
-/** A name in a language, or in the other one when the app has none in that language. */
+// The app names a thing in the languages its organiser wrote; lib/app.ts keeps the ones in
+// `Names`. Any other language of the site shows the English name.
+const nameFor = (names: Names, locale: Locale): string | null => (names as Record<string, string | null>)[locale] ?? null;
+
+/** A name in a language, or in English — then Thai — when the app has none in that language. */
 export function nameIn(names: Names, locale: Locale): string {
-	return names[locale] ?? names.en ?? names.th ?? "";
+	return nameFor(names, locale) ?? names.en ?? names.th ?? "";
 }
 
 /** The languages a thing is really named in: what hreflang and the sitemap may claim. */
 export function languagesOf(names: Names): Locale[] {
-	const named = LOCALES.filter((locale) => names[locale]);
+	const named = LOCALES.filter((locale) => nameFor(names, locale));
 	return named.length > 0 ? named : [DEFAULT_LOCALE];
 }
 
@@ -37,7 +41,7 @@ const asDate = (day: string) => new Date(`${day}T00:00:00Z`);
 
 /** "15 April 2026", from a calendar date. Formatted in UTC so the day never slips. */
 export function dayLabel(locale: Locale, day: string): string {
-	return asDate(day).toLocaleDateString(LOCALE_INFO[locale].dateLocale, {
+	return asDate(day).toLocaleDateString(dateLocale(locale), {
 		year: "numeric",
 		month: "long",
 		day: "numeric",
@@ -200,7 +204,7 @@ const dropEmpty = (thing: JsonLd): JsonLd =>
 /** The name in the page's language, and the other language's as `alternateName`. */
 function named(names: Names, locale: Locale) {
 	const name = nameIn(names, locale);
-	const other = LOCALES.map((l) => names[l]).find((n) => n && n !== name);
+	const other = LOCALES.map((l) => nameFor(names, l)).find((n) => n && n !== name);
 	return { name, alternateName: other ?? null };
 }
 
