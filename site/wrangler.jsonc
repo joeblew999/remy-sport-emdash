@@ -9,6 +9,10 @@
 	"vars": {
 		"APP_ORIGIN": "https://remy.ubuntusoftware.net",
 		"HELP_ORIGIN": "https://help.remy.ubuntusoftware.net",
+		// "true" once the app this site reads holds real events. Until then event and organisation
+		// pages carry a "sample data" notice and noindex, and stay out of the sitemap: the app's
+		// test entries are invented events under real schools' names.
+		"APP_DATA_IS_REAL": "false",
 	},
 	"d1_databases": [
 		{

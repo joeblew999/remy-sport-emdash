@@ -5,7 +5,7 @@
 import type { AstroGlobal } from "astro";
 
 import { DEFAULT_LOCALE, LOCALE_INFO, LOCALES, type Locale } from "../i18n/ui";
-import { getEvent, getOrg, listEvents, listOrgs, type Names, type PublicEvent, type PublicOrg } from "./app";
+import { APP_DATA_IS_REAL, getEvent, getOrg, listEvents, listOrgs, type Names, type PublicEvent, type PublicOrg } from "./app";
 import { absoluteUrl, localeOf, localePath } from "./site";
 
 type Ctx = Pick<AstroGlobal, "originPathname" | "site" | "url" | "params">;
@@ -159,11 +159,14 @@ export function markUnavailable(Astro: Pick<AstroGlobal, "response">) {
 type SitemapGroup = { lastmod?: Date; versions: { locale: Locale; path: string }[] };
 
 /**
- * Every event and organisation page, for the sitemap, in the languages each is named in.
+ * Every event and organisation page, for the sitemap, in the languages each is named in —
+ * once the app's data is real (APP_DATA_IS_REAL). Until then, none.
  * `complete` is false when the app did not answer: the sitemap then lists what it can and is
  * not kept for long.
  */
 export async function appPages(): Promise<{ groups: SitemapGroup[]; complete: boolean }> {
+	// Sample data is not offered to a search engine: nothing is listed, and the app is not asked.
+	if (!APP_DATA_IS_REAL) return { groups: [], complete: true };
 	const [events, orgs] = await Promise.all([listEvents(), listOrgs()]);
 	const groups: SitemapGroup[] = [];
 	const add = (path: string, locales: readonly Locale[], updated?: string | null) => {

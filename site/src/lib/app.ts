@@ -24,7 +24,7 @@
 
 import { env } from "cloudflare:workers";
 
-type Vars = { APP_ORIGIN?: string; APP_API_ORIGIN?: string; HELP_ORIGIN?: string };
+type Vars = { APP_ORIGIN?: string; APP_API_ORIGIN?: string; HELP_ORIGIN?: string; APP_DATA_IS_REAL?: string };
 const vars = env as unknown as Vars;
 
 const origin = (value: string | undefined, fallback: string) =>
@@ -34,6 +34,13 @@ const origin = (value: string | undefined, fallback: string) =>
 export const APP_ORIGIN = origin(vars.APP_ORIGIN, "https://remy.ubuntusoftware.net");
 /** Which app this site READS. Defaults to the one it links to; a local `.dev.vars` can point it at staging. */
 export const APP_API_ORIGIN = origin(vars.APP_API_ORIGIN, APP_ORIGIN);
+/**
+ * Are the app's events and organisations real ones? Only when `vars.APP_DATA_IS_REAL` is "true".
+ * Until then they are the app's sample entries — invented events under real schools' names — so
+ * the pages say so, ask not to be indexed, and stay out of the sitemap. This is about truth, not
+ * privacy: the privacy line above holds either way.
+ */
+export const APP_DATA_IS_REAL = vars.APP_DATA_IS_REAL === "true";
 /** The how-to site. `vars.HELP_ORIGIN` in wrangler.jsonc. */
 export const HELP_ORIGIN = origin(vars.HELP_ORIGIN, "https://help.remy.ubuntusoftware.net");
 
@@ -97,7 +104,10 @@ type Raw = Record<string, unknown>;
 const isObject = (value: unknown): value is Raw => typeof value === "object" && value !== null && !Array.isArray(value);
 const text = (value: unknown) => (typeof value === "string" && value.trim() ? value.trim() : null);
 const day = (value: unknown) => (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : null);
-const ID = /^[A-Za-z0-9_-]{1,64}$/;
+// An id of the app's: "evt_003", "org_010", or a UUID. Every one has a digit in it, and none of
+// the app's own route words has ("invitations", "mine", "members") — so a word in the place of an
+// id is never sent to the app, where it would be a different operation.
+const ID = /^(?=[A-Za-z_-]*\d)[A-Za-z0-9_-]{1,64}$/;
 const id = (value: unknown) => (typeof value === "string" && ID.test(value) ? value : null);
 
 function toNames(value: unknown, plain?: unknown): Names {
@@ -152,8 +162,9 @@ const toList =
 
 // The whole of what this site may ask the app: a list of events or organisations, or one of them
 // by id. Anything else — and `/api/events/<id>/teams` is "anything else" — is refused here, before
-// a request is made.
-const ALLOWED = /^\/api\/(events|orgs)(\/[A-Za-z0-9_-]+)?$/;
+// a request is made. The second segment must be an id (see ID): `/api/events/invitations` is the
+// app's list of the people invited to co-organise, and is refused too.
+const ALLOWED = /^\/api\/(events|orgs)(\/(?=[A-Za-z_-]*\d)[A-Za-z0-9_-]{1,64})?$/;
 
 /** How long the app is given to answer before a page stops waiting. */
 const TIMEOUT_MS = 4000;
@@ -201,13 +212,16 @@ async function read<T>(path: string, project: (value: unknown) => T | null): Pro
 		response = await fetch(`${APP_API_ORIGIN}${path}`, {
 			headers: { Accept: "application/json" },
 			credentials: "omit",
+			// A redirect is not followed: it would be a request to a path this file did not check.
+			redirect: "manual",
 			signal: AbortSignal.timeout(TIMEOUT_MS),
 		});
 	} catch (error) {
 		return lastCopy(error instanceof Error ? error.message : "no answer");
 	}
-	if (response.status === 404 || response.status === 410) {
-		// The app says it is gone: so is the copy.
+	// 404 and 410: the app says it is gone. 401: it is something only a signed-in person may
+	// read, which this site never shows. Either way there is no such page here, and no copy.
+	if (response.status === 404 || response.status === 410 || response.status === 401) {
 		await cache?.delete(key).catch(() => {});
 		return { ok: false, reason: "missing" };
 	}

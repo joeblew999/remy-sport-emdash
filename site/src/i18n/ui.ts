@@ -70,6 +70,8 @@ const en = {
 	inAppNote: "Schedules, results and following an event are in the app.",
 	allEvents: "All events",
 	allOrgs: "All organisations",
+	sampleData:
+		"Sample data. The app is still being tested, and the events and organisations it lists are test entries. These events are not real.",
 	appDownTitle: "This page is not available right now",
 	appDownBody:
 		"Events and organisations are read from the app, and the app did not answer. Nothing has been removed. Please try again in a few minutes.",

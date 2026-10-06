@@ -1,6 +1,7 @@
 ---
 // "/events/<id>/<slug>" — one event: what it is, when, where, who organises it, and the way
 // into the app. Every fact is the app's; no person is named, by construction (lib/app.ts).
+import SampleNotice from "../components/SampleNotice.astro";
 import type { PublicEvent, PublicOrg } from "../lib/app";
 import { appHref } from "../lib/app";
 import { codeLabel, dateRange, nameIn, orgPath } from "../lib/entities";
@@ -24,6 +25,7 @@ const facts = [
 ---
 
 <article class="narrow">
+	<SampleNotice />
 	<header class="page-head">
 		{kind && <p class="section-label">{kind}</p>}
 		<h1>{nameIn(event.names, locale)}</h1>

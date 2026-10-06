@@ -2,6 +2,7 @@
 // "/organisations/<id>/<slug>" — one organisation's profile and the events it organises. Not
 // its members, teams or coaches: those name people.
 import EventCard from "../components/EventCard.astro";
+import SampleNotice from "../components/SampleNotice.astro";
 import type { PublicEvent, PublicOrg } from "../lib/app";
 import { appHref } from "../lib/app";
 import { codeLabel, nameIn } from "../lib/entities";
@@ -19,6 +20,7 @@ const kind = [codeLabel(org.orgTypeCode), codeLabel(org.cityCode)].filter(Boolea
 ---
 
 <article class="narrow">
+	<SampleNotice />
 	<header class="page-head">
 		{kind && <p class="section-label">{kind}</p>}
 		<h1>{nameIn(org.names, locale)}</h1>

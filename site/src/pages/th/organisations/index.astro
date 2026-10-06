@@ -2,6 +2,7 @@
 // The Thai address of the same route under ../ — the same code; the language comes from the URL.
 // "/organisations" — every organisation the app lists. Read from the app's public API (lib/app.ts).
 import AppUnavailable from "../../../components/AppUnavailable.astro";
+import { APP_DATA_IS_REAL } from "../../../lib/app";
 import Base from "../../../layouts/Base.astro";
 import { LOCALES, t } from "../../../i18n/ui";
 import { loadOrgsIndex, markUnavailable } from "../../../lib/entities";
@@ -19,7 +20,7 @@ const shell = await loadShell(Astro, { cacheable: Boolean(orgs) });
 	title={t(locale, "orgsTitle")}
 	description={t(locale, "orgsDescription")}
 	languages={LOCALES}
-	noindex={!orgs}
+	noindex={!orgs || !APP_DATA_IS_REAL}
 >
 	{orgs ? <OrgsIndexView orgs={orgs} /> : <AppUnavailable />}
 </Base>

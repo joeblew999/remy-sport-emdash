@@ -1,6 +1,7 @@
 ---
 // "/organisations" — the schools, clubs and federations the app lists. Profiles only: an
 // organisation's members are people, and this site never reads them.
+import SampleNotice from "../components/SampleNotice.astro";
 import type { PublicOrg } from "../lib/app";
 import { codeLabel, nameIn, orgPath } from "../lib/entities";
 import { t } from "../i18n/ui";
@@ -17,6 +18,7 @@ const sorted = orgs.toSorted((a, b) => nameIn(a.names, locale).localeCompare(nam
 ---
 
 <div class="wrap">
+	<SampleNotice />
 	<header class="page-head">
 		<h1>{t(locale, "orgsTitle")}</h1>
 		<p class="lead">{t(locale, "orgsDescription")}</p>

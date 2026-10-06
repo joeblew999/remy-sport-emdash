@@ -2,6 +2,7 @@
 // "/events/<id>/<slug>" — one event, from the app's `GET /api/events/<id>`. The id is what is
 // looked up; "/events/<id>" and a stale slug redirect to the address with the current one.
 import AppUnavailable from "../../../components/AppUnavailable.astro";
+import { APP_DATA_IS_REAL } from "../../../lib/app";
 import Base from "../../../layouts/Base.astro";
 import { t } from "../../../i18n/ui";
 import {
@@ -39,7 +40,7 @@ const description = event
 	description={description}
 	languages={languages}
 	isFallback={Boolean(event) && !languages.includes(locale)}
-	noindex={!event}
+	noindex={!event || !APP_DATA_IS_REAL}
 	jsonLd={event ? sportsEventJsonLd(Astro, event, org, locale) : undefined}
 >
 	{event ? <EventView event={event} org={org} /> : <AppUnavailable />}
