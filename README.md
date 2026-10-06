@@ -42,14 +42,15 @@ Everything is in `site/`.
 
 | where | what |
 |---|---|
-| `seed/seed.json` | The content model and the first content: two collections (`pages`, `posts`), two taxonomies on posts (`audience`, `topic`), the `primary` and `footer` menus in both languages, and the site settings that carry the name and tagline. No events, organisations, teams or people: those are the app's |
+| `seed/seed.json` | The content model and the first content: two collections (`pages`, `posts`), two taxonomies on posts (`audience`, `topic`), the `primary` and `footer` menus in English and Thai, and the site settings that carry the name and tagline. No events, organisations, teams or people: those are the app's |
 | `src/layouts/Base.astro` | The one layout: header, footer, menus, language switch, and the whole `<head>` — title, description, canonical, Open Graph and Twitter tags, `hreflang`, the RSS link |
 | `src/lib/site.ts` | What every page needs: the language of a request, paths and absolute URLs, loading an entry with the English fallback, and `loadShell`, which every page calls first (settings, menus, and what the edge cache is told) |
 | `src/lib/app.ts` | The only place that knows where the app and the help site are, builds links into them, and reads the app's API: four typed reads, a timeout, a five-minute copy, and the filter that enforces the privacy line |
 | `src/lib/entities.ts` | Event and organisation pages: their addresses and slugs, what each loads, what happens when the app does not answer, their sitemap entries and their schema.org data |
-| `src/i18n/ui.ts` | The words the templates print themselves (buttons, labels, notices), in English and Thai |
+| `src/i18n/` | The words the templates print themselves (buttons, labels, notices): `messages/<code>.json`, one file per language, read through `ui.ts` |
+| `src/components/LanguageSwitcher.astro` | The language switch in the footer |
 | `src/views/` | What each kind of page looks like |
-| `src/pages/` | The routes. Each is a few lines: load, then hand to a view. `src/pages/th/` holds the same routes for Thai |
+| `src/pages/` | The routes, once, for every language. Each is a few lines: load, then hand to a view. `[...path].astro` is the `pages` collection; `[...locale]/` holds the rest, and that first segment is the language |
 
 The name is never written in a page. It is the `title` setting (Settings in the admin; `settings` in
 the seed). An unset title shows the host name, so a missing setting is obvious.
@@ -64,18 +65,55 @@ the seed). An unset title shows the host name, so a missing setting is obvious.
 | `APP_DATA_IS_REAL` | `vars` in `site/wrangler.jsonc` | `"false"` today. The app's events are test entries: invented events under real schools' names. Until this is `"true"`, every event and organisation page shows a "Sample data" notice, carries `noindex`, and is left out of the sitemap. Set it to `"true"` when the app this site reads holds real events |
 | `SITE_PORT` | `mise.local.toml` (gitignored) | The local port, when 4321 is taken |
 
-### Two languages
+### Languages
 
-English is the default and has no prefix; Thai is under `/th/`. (A prefixed default language breaks
-the EmDash admin.) Each entry exists once per language, linked as translations of each other.
+The site answers in the 27 languages the app speaks, under the same codes. The list is in one
+place: `locales` in `site/astro.config.mjs`. Astro and EmDash are configured from it and the
+site's code reads it back, so adding a language is one edit there (and, if it has words of its
+own, one file in `src/i18n/messages/`).
 
-- A page with no **published** Thai version shows the English text at its `/th/` address, with a
-  notice saying so, and its canonical link points at the English page. It is not a 404.
-- `hreflang` and the sitemap name only the languages a page is really published in.
-- **The Thai is not written.** The seed holds a Thai draft of every page, titled
-  "[TH — needs translation]", and Thai menu labels and interface words (`src/i18n/ui.ts`) that no
-  native speaker has reviewed. Translate in the admin, have a person who reads Thai review it, then
-  publish. Nothing Thai is published until someone does.
+- **Addresses.** English is the default and has no prefix; every other language is under its
+  code: `/th/…`, `/ja/…`, `/zh-TW/…`. (A prefixed default language breaks the EmDash admin.) There
+  is one set of routes: the language is the first segment of the address, checked against the
+  list. `/xx/events` and `/en/events` are 404s; a code is matched as written, so `/zh-tw/` is too.
+- **Content** is EmDash's: an entry exists once per language, linked as translations of each
+  other, each with its own draft and published state. A page with no **published** version in a
+  language shows the English text at that language's address, with a notice saying so, and its
+  canonical link points at the English page. It is never a 404, and nothing unpublished is shown.
+- **Interface words** (`src/i18n/messages/`). `en.json` holds all 54. Each other language holds
+  the 21 the app already had in that language — "Venue", "Divisions", "Organised by", "Sample
+  data", the theme switch — copied once from the app's own catalogues, with the language's own
+  name and its direction. The other 33 show in English. `src/i18n/ui.ts` lists which key came from
+  which; nothing in those files was translated for this site.
+- **Right to left.** Arabic, Persian and Urdu pages are `dir="rtl"`. English text standing in
+  for a missing translation is marked `lang="en" dir="ltr"`.
+- **The language switch** lists every language by its own name and links to the same page in
+  each; for an entry it uses the slug of that language's published translation.
+- **`hreflang` and the sitemap** name only the languages a page is really published in — for an
+  event or organisation, the languages the app names it in. The sitemap lists a language's pages
+  once that language's home page is published.
+- **Menus and taxonomy terms** are EmDash's too, one per language; a language without its own
+  shows the English one.
+- **Fonts.** Inter, and Noto Sans Thai on Thai pages. Other scripts use the reader's system fonts.
+
+**Nothing but English is written yet.** The seed holds a Thai draft of every page, titled
+"[TH — needs translation]", and Thai menu labels that no native speaker has reviewed. Translate
+in the admin (open an entry, then **Translations** in the sidebar), have a person who reads the
+language review it, then publish. Nothing is public in a language until someone does.
+
+**Machine translation is not set up.** The plan was the LinguaDash plugin from EmDash's registry,
+which drafts translations with DeepL, OpenAI or Cloudflare AI for a person to review. It asks for
+content read and write, schema read, and network access to those three services only, and its
+0.1.0 bundle does nothing else. EmDash 1.1.0 will not install it: the publisher's signed policy
+requires build provenance and the one release in the registry has none (`PROVENANCE_REQUIRED`).
+It is not installed, and the check was not worked around. Two things have to be true first:
+
+- a release EmDash will verify — the publisher's to publish — or the owner's decision to take
+  the plugin as an npm dependency instead (`emdash-plugin-linguadash`, added to `sandboxed` in
+  `astro.config.mjs`), which also makes the install part of this repo;
+- a plugin sandbox. A registry plugin runs on Cloudflare's Worker Loader: `sandboxRunner` in
+  `astro.config.mjs` and the `LOADER` binding in `wrangler.jsonc`, both off here. Deploying with
+  that binding needs the Workers Paid plan.
 
 ### What it sets that the template did not
 
@@ -84,7 +122,7 @@ the EmDash admin.) Each entry exists once per language, linked as translations o
   address — this machine, a preview — it disallows everything.
 - `sitemap.xml` (`src/pages/sitemap.xml.ts`): one file, every indexable page in every language it
   is published in. It replaces EmDash's, which would list the home entry at `/home`.
-- RSS for the blog at `/rss.xml` and `/th/rss.xml`.
+- RSS for the blog at `/rss.xml`, and at `/<code>/rss.xml` for each other language.
 - Open Graph and Twitter tags on every page. **There is no share image yet**: set one in the admin
   (Settings → SEO → default image) when there is artwork; a post's cover image is used for that post.
 - The edge cache: `cacheCloudflare()` in the config. A page is fresh for five minutes, may be served
@@ -105,7 +143,7 @@ from this site to the app later changes who answers it and not the address.
 | `/privacy`, `/terms` | this site — placeholders until the owner writes them. The app should link here | built, drafts |
 | `/blog`, `/blog/<slug>` | this site — posts. `?audience=` and `?topic=` filter the list | built |
 | `/rss.xml`, `/sitemap.xml`, `/robots.txt` | this site | built |
-| `/th/…` | this site — every address above, in Thai. Event and organisation names are the app's Thai names | built; Thai text not written |
+| `/<code>/…` | this site — every address above in another language: `/th/…`, `/ja/…`, `/ar/…`, 26 in all. Event and organisation names are the app's: Thai under `/th/`, English elsewhere | built; only English is written |
 | `/events` | this site, from the app's `GET /api/events` — upcoming first, then finished | built |
 | `/events/<id>/<slug>` | this site, from `GET /api/events/<id>`. The id is what is looked up; the slug is made from the English name, and `/events/<id>` or a wrong slug redirects (301) to the right one | built |
 | `/organisations`, `/organisations/<id>/<slug>` | this site, from `GET /api/orgs` and `/api/orgs/<id>`, same rules; the slug is the app's own | built |
@@ -225,10 +263,11 @@ page. Both need a deployed, public address.
 
 - The privacy policy and the terms. Both pages say what they must cover.
 - A contact address or form for `/about`. It says "not published yet".
-- The Thai text, reviewed by a native speaker. That includes the labels on event and organisation
-  pages ("Dates", "Venue", "Organised by", …), which show in English under `/th/` until someone
-  writes them in `src/i18n/ui.ts`, and the two Thai menu labels for those pages, which are the
-  app's own unreviewed words.
+- The text in each language, reviewed by a person who reads it — Thai first. That includes the
+  33 interface words the app does not have ("Dates", "Open the app", the sample-data sentence, the
+  message shown when the app does not answer), which show in English until someone writes them
+  in `src/i18n/messages/<code>.json`, and the Thai menu labels, which no native speaker has read.
+- How content gets translated: see "Machine translation is not set up" above.
 - Whether an event's free-text description may be shown (see "What is filtered").
 - Real events. Production holds the app's fixture events; a page per event is worth little until
   the events are real. When they are, set `APP_DATA_IS_REAL` to `"true"` (above).
@@ -239,7 +278,6 @@ page. Both need a deployed, public address.
 
 - **The domain.** The site is built and reviewed on Cloudflare's default address. Pick the real one
   before editors are invited: sign-in is tied to the domain it was set up on.
-- **Languages.** English and Thai are assumed.
 
 ## Where the thinking is
 

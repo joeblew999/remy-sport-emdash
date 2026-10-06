@@ -62,7 +62,10 @@ export function helpHref(): string {
 
 // ── Reading the app ─────────────────────────────────────────────────────────────────────────
 
-/** A name in the two languages this site has. The app sends up to 27; the rest are dropped. */
+/**
+ * A name in the two languages the app's entries are written in today. The app can send up to 27;
+ * the rest are dropped here, and a page in any other language shows the English name.
+ */
 export type Names = { en: string | null; th: string | null };
 
 /** An event, as far as this site is concerned. See the privacy line for what is left out. */
