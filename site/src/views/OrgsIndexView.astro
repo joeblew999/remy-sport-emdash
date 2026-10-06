@@ -1,0 +1,61 @@
+---
+// "/organisations" — the schools, clubs and federations the app lists. Profiles only: an
+// organisation's members are people, and this site never reads them.
+import type { PublicOrg } from "../lib/app";
+import { codeLabel, nameIn, orgPath } from "../lib/entities";
+import { t } from "../i18n/ui";
+import { localeOf, localePath } from "../lib/site";
+
+interface Props {
+	orgs: PublicOrg[];
+}
+
+const { orgs } = Astro.props;
+const locale = localeOf(Astro);
+// The app sorts by its slug; a reader expects the order of the names they see.
+const sorted = orgs.toSorted((a, b) => nameIn(a.names, locale).localeCompare(nameIn(b.names, locale), locale));
+---
+
+<div class="wrap">
+	<header class="page-head">
+		<h1>{t(locale, "orgsTitle")}</h1>
+		<p class="lead">{t(locale, "orgsDescription")}</p>
+	</header>
+
+	{
+		sorted.length === 0 ? (
+			<p class="empty">{t(locale, "noOrgs")}</p>
+		) : (
+			<ul class="cards">
+				{sorted.map((org) => (
+					<li>
+						<article class="card">
+							<p class="section-label">
+								{[codeLabel(org.orgTypeCode), codeLabel(org.cityCode)].filter(Boolean).join(" · ")}
+							</p>
+							<h2 class="name">
+								<a href={localePath(orgPath(org), locale)}>{nameIn(org.names, locale)}</a>
+							</h2>
+						</article>
+					</li>
+				))}
+			</ul>
+		)
+	}
+
+	<p class="more"><a href={localePath("/events", locale)}>{t(locale, "allEvents")}</a></p>
+</div>
+
+<style>
+	.name {
+		font-size: var(--font-size-xl);
+	}
+
+	.empty {
+		color: var(--color-muted);
+	}
+
+	.more {
+		margin-top: var(--spacing-8);
+	}
+</style>

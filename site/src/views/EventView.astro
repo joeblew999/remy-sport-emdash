@@ -1,0 +1,92 @@
+---
+// "/events/<id>/<slug>" — one event: what it is, when, where, who organises it, and the way
+// into the app. Every fact is the app's; no person is named, by construction (lib/app.ts).
+import type { PublicEvent, PublicOrg } from "../lib/app";
+import { appHref } from "../lib/app";
+import { codeLabel, dateRange, nameIn, orgPath } from "../lib/entities";
+import { t } from "../i18n/ui";
+import { localeOf, localePath } from "../lib/site";
+
+interface Props {
+	event: PublicEvent;
+	org: PublicOrg | null;
+}
+
+const { event, org } = Astro.props;
+const locale = localeOf(Astro);
+const kind = codeLabel(event.typeCode);
+const facts = [
+	{ label: t(locale, "eventWhen"), value: dateRange(locale, event) ?? t(locale, "eventDatesUnknown") },
+	{ label: t(locale, "eventVenue"), value: event.venueNames && nameIn(event.venueNames, locale) },
+	{ label: t(locale, "eventCity"), value: codeLabel(event.cityCode) },
+	{ label: t(locale, "eventFormat"), value: event.formatCode },
+].filter((fact) => fact.value);
+---
+
+<article class="narrow">
+	<header class="page-head">
+		{kind && <p class="section-label">{kind}</p>}
+		<h1>{nameIn(event.names, locale)}</h1>
+	</header>
+
+	<dl class="facts">
+		{
+			facts.map((fact) => (
+				<div>
+					<dt>{fact.label}</dt>
+					<dd>{fact.value}</dd>
+				</div>
+			))
+		}
+		{
+			org && (
+				<div>
+					<dt>{t(locale, "eventOrganiser")}</dt>
+					<dd>
+						<a href={localePath(orgPath(org), locale)}>{nameIn(org.names, locale)}</a>
+					</dd>
+				</div>
+			)
+		}
+		{
+			event.divisionNames.length > 0 && (
+				<div>
+					<dt>{t(locale, "eventDivisions")}</dt>
+					<dd>{event.divisionNames.map((names) => nameIn(names, locale)).join(", ")}</dd>
+				</div>
+			)
+		}
+	</dl>
+
+	<div class="cta-row">
+		<a class="btn btn-primary" href={appHref({ page: "event", id: event.id }, "event")}>
+			{t(locale, "openEventInApp")}
+		</a>
+		<a class="btn" href={localePath("/events", locale)}>{t(locale, "allEvents")}</a>
+	</div>
+	<p class="note">{t(locale, "inAppNote")}</p>
+</article>
+
+<style>
+	.facts {
+		display: grid;
+		gap: var(--spacing-4);
+		margin: 0 0 var(--spacing-8);
+	}
+
+	.facts dt {
+		color: var(--color-muted);
+		font-size: var(--font-size-sm);
+	}
+
+	.facts dd {
+		margin: 0;
+		font-size: var(--font-size-lg);
+	}
+
+	.note {
+		margin-top: var(--spacing-4);
+		color: var(--color-muted);
+		font-size: var(--font-size-sm);
+	}
+</style>

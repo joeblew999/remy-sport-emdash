@@ -1,0 +1,24 @@
+---
+// "/events" — every event the app lists. Read from the app's public API (lib/app.ts).
+import AppUnavailable from "../../components/AppUnavailable.astro";
+import Base from "../../layouts/Base.astro";
+import { LOCALES, t } from "../../i18n/ui";
+import { loadEventsIndex, markUnavailable } from "../../lib/entities";
+import { loadShell, localeOf } from "../../lib/site";
+import EventsIndexView from "../../views/EventsIndexView.astro";
+
+const locale = localeOf(Astro);
+const data = await loadEventsIndex();
+if (!data) markUnavailable(Astro);
+const shell = await loadShell(Astro, { cacheable: Boolean(data) });
+---
+
+<Base
+	shell={shell}
+	title={t(locale, "eventsTitle")}
+	description={t(locale, "eventsDescription")}
+	languages={LOCALES}
+	noindex={!data}
+>
+	{data ? <EventsIndexView upcoming={data.upcoming} past={data.past} /> : <AppUnavailable />}
+</Base>

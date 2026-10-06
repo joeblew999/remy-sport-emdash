@@ -1,0 +1,58 @@
+---
+// "/events" — every event the app lists: the ones still to come first, then the finished ones.
+import EventCard from "../components/EventCard.astro";
+import type { PublicEvent } from "../lib/app";
+import { t } from "../i18n/ui";
+import { localeOf, localePath } from "../lib/site";
+
+interface Props {
+	upcoming: PublicEvent[];
+	past: PublicEvent[];
+}
+
+const { upcoming, past } = Astro.props;
+const locale = localeOf(Astro);
+const sections = [
+	{ title: t(locale, "eventsUpcoming"), events: upcoming },
+	{ title: t(locale, "eventsPast"), events: past },
+].filter((section) => section.events.length > 0);
+---
+
+<div class="wrap">
+	<header class="page-head">
+		<h1>{t(locale, "eventsTitle")}</h1>
+		<p class="lead">{t(locale, "eventsDescription")}</p>
+	</header>
+
+	{sections.length === 0 && <p class="empty">{t(locale, "noEvents")}</p>}
+	{
+		sections.map((section) => (
+			<section class="group">
+				<h2 class="section-label">{section.title}</h2>
+				<ul class="cards">
+					{section.events.map((event) => (
+						<li>
+							<EventCard event={event} />
+						</li>
+					))}
+				</ul>
+			</section>
+		))
+	}
+
+	<p class="more"><a href={localePath("/organisations", locale)}>{t(locale, "allOrgs")}</a></p>
+</div>
+
+<style>
+	.group {
+		margin-bottom: var(--spacing-12);
+	}
+
+	.empty {
+		color: var(--color-muted);
+	}
+
+	.more {
+		margin-top: var(--spacing-8);
+	}
+</style>

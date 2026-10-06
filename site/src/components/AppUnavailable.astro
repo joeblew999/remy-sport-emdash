@@ -1,0 +1,16 @@
+---
+// Shown in place of an event or organisation page when the app did not answer and there is no
+// copy to show. The page that uses it answers 503 (lib/entities.ts, markUnavailable).
+import { t } from "../i18n/ui";
+import { localeOf, localePath } from "../lib/site";
+
+const locale = localeOf(Astro);
+---
+
+<div class="narrow page-head">
+	<h1>{t(locale, "appDownTitle")}</h1>
+	<p class="lead">{t(locale, "appDownBody")}</p>
+	<div class="cta-row">
+		<a class="btn" href={localePath("/", locale)}>{t(locale, "goHome")}</a>
+	</div>
+</div>

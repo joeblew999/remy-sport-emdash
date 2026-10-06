@@ -1,0 +1,37 @@
+---
+// One event in a list: its name, when, and where. The facts are the app's.
+import type { PublicEvent } from "../lib/app";
+import { codeLabel, dateRange, eventPath, nameIn, placeLabel } from "../lib/entities";
+import { t } from "../i18n/ui";
+import { localeOf, localePath } from "../lib/site";
+
+interface Props {
+	event: PublicEvent;
+	heading?: "h2" | "h3";
+}
+
+const { event, heading: Heading = "h3" } = Astro.props;
+const locale = localeOf(Astro);
+const kind = [codeLabel(event.typeCode), event.formatCode].filter(Boolean).join(" · ");
+---
+
+<article class="card event-card">
+	{kind && <p class="section-label">{kind}</p>}
+	<Heading class="name">
+		<a href={localePath(eventPath(event), locale)}>{nameIn(event.names, locale)}</a>
+	</Heading>
+	<p class="facts">{dateRange(locale, event) ?? t(locale, "eventDatesUnknown")}</p>
+	{placeLabel(locale, event) && <p class="facts">{placeLabel(locale, event)}</p>}
+</article>
+
+<style>
+	.name {
+		font-size: var(--font-size-xl);
+		margin-bottom: var(--spacing-2);
+	}
+
+	.facts {
+		color: var(--color-text-secondary);
+		font-size: var(--font-size-sm);
+	}
+</style>

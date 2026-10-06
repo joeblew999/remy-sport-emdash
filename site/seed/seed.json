@@ -159,6 +159,11 @@
 			"items": [
 				{
 					"type": "custom",
+					"label": "Events",
+					"url": "/events"
+				},
+				{
+					"type": "custom",
 					"label": "For organisers",
 					"url": "/organisers"
 				},
@@ -187,6 +192,11 @@
 			"items": [
 				{
 					"type": "custom",
+					"label": "Organisations",
+					"url": "/organisations"
+				},
+				{
+					"type": "custom",
 					"label": "About",
 					"url": "/about"
 				},
@@ -208,6 +218,11 @@
 			"label": "Primary navigation",
 			"locale": "th",
 			"items": [
+				{
+					"type": "custom",
+					"label": "รายการแข่งขัน",
+					"url": "/events"
+				},
 				{
 					"type": "custom",
 					"label": "สำหรับผู้จัดงาน",
@@ -237,6 +252,11 @@
 			"label": "Footer",
 			"locale": "th",
 			"items": [
+				{
+					"type": "custom",
+					"label": "องค์กร",
+					"url": "/organisations"
+				},
 				{
 					"type": "custom",
 					"label": "เกี่ยวกับเรา",

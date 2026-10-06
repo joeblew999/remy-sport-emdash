@@ -30,6 +30,8 @@ interface Props {
 	/** For a page with no entry (the blog index): the languages it really exists in. */
 	languages?: readonly Locale[];
 	noindex?: boolean;
+	/** schema.org structured data for this page, written into the head as JSON-LD. */
+	jsonLd?: Record<string, unknown>;
 }
 
 const {
@@ -43,6 +45,7 @@ const {
 	isFallback = false,
 	languages,
 	noindex = false,
+	jsonLd,
 	shell,
 } = Astro.props;
 
@@ -108,6 +111,10 @@ const isLoggedIn = Boolean(Astro.locals.user);
 		<title>{fullTitle}</title>
 		<EmDashHead page={pageCtx} />
 		{alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={absoluteUrl(Astro, a.path)} />)}
+		{
+			// "<" is escaped so that no name from outside can close the script element.
+			jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, "\\u003c")} />
+		}
 		<link
 			rel="alternate"
 			type="application/rss+xml"

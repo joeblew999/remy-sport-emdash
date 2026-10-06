@@ -1,0 +1,60 @@
+---
+// "/organisations/<id>/<slug>" — one organisation's profile and the events it organises. Not
+// its members, teams or coaches: those name people.
+import EventCard from "../components/EventCard.astro";
+import type { PublicEvent, PublicOrg } from "../lib/app";
+import { appHref } from "../lib/app";
+import { codeLabel, nameIn } from "../lib/entities";
+import { t } from "../i18n/ui";
+import { localeOf, localePath } from "../lib/site";
+
+interface Props {
+	org: PublicOrg;
+	events: PublicEvent[];
+}
+
+const { org, events } = Astro.props;
+const locale = localeOf(Astro);
+const kind = [codeLabel(org.orgTypeCode), codeLabel(org.cityCode)].filter(Boolean).join(" · ");
+---
+
+<article class="narrow">
+	<header class="page-head">
+		{kind && <p class="section-label">{kind}</p>}
+		<h1>{nameIn(org.names, locale)}</h1>
+	</header>
+
+	<section class="events">
+		<h2 class="section-label">{t(locale, "orgEvents")}</h2>
+		{
+			events.length === 0 ? (
+				<p class="empty">{t(locale, "orgNoEvents")}</p>
+			) : (
+				<ul class="cards">
+					{events.map((event) => (
+						<li>
+							<EventCard event={event} />
+						</li>
+					))}
+				</ul>
+			)
+		}
+	</section>
+
+	<div class="cta-row">
+		<a class="btn btn-primary" href={appHref({ page: "org", id: org.id }, "organisation")}>
+			{t(locale, "openOrgInApp")}
+		</a>
+		<a class="btn" href={localePath("/organisations", locale)}>{t(locale, "allOrgs")}</a>
+	</div>
+</article>
+
+<style>
+	.events {
+		margin-bottom: var(--spacing-8);
+	}
+
+	.empty {
+		color: var(--color-muted);
+	}
+</style>
