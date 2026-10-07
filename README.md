@@ -24,9 +24,38 @@ mise run emdash -- content list posts    anything else, through EmDash's CLI
 
 The admin, signed in: `http://localhost:<SITE_PORT>/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin`
 (the port is 4321 unless `SITE_PORT` in `mise.toml` or `mise.local.toml` says otherwise).
-`mise tasks ls` lists every task. Deploying and signing in to the deployed site are in
-[emdash-run's README](https://github.com/joeblew999/emdash-run#readme): `live:ship`, `signin:access`,
-`signin:token -- --live`, and `-- --live` on any task to act on the deployed site.
+`mise tasks ls` lists every task; what each does is in
+[emdash-run's docs](https://joeblew999.github.io/emdash-run/).
+
+## Deployed
+
+`https://remy-sport-site.gedw99.workers.dev` — Cloudflare's default address, until the domain is
+decided. The Worker and its D1 database are `remy-sport-site`; the R2 bucket is
+`remy-sport-site-media`. The address is `LIVE_URL` in `mise.toml`.
+
+```
+mise run live:ship                       check, build, deploy, wait for it to answer
+mise run live:undo                       back to the version before (code only)
+mise run live:logs
+mise run live:backup                     a database bookmark and a content package in site/backups/
+mise run signin:token -- --live          once per machine: the CLI is signed in to the deployed site
+mise run emdash -- content list posts --live
+mise run model:sync -- --live
+```
+
+**Signing in.** The admin and its API (`/_emdash/…`) are behind Cloudflare Access: a person opens
+`/_emdash/admin` and gets a code by email; only the address in `ADMIN_EMAIL` (in the gitignored
+`mise.local.toml`) is let in. `mise run signin:access` set that up and is safe to run again. A
+machine needs the Access pass that task saved in `~/.config/emdash-run/` and `signin:token -- --live`.
+Uploaded media is under `/_emdash/` too and is **not public yet** — see the plan.
+
+**Content does not travel with a deploy.** `live:ship` ships code. A change made on this machine
+reaches the deployed site as an EmDash package (`mise run emdash -- site export --output <file>`,
+then `site import <file> --analyze --live`, read the plan, then `--plan <digest> --confirm --live`),
+and that import is for a site with no content of its own. From here on, write on the deployed site.
+
+How the first deployment was done, step by step, with what failed: item 3 of
+[the plan](docs/plans/2026-10-06-next.md).
 
 Build the site in `site/` — pages, layouts, components, the seed. The dev server reloads your
 edits.
@@ -37,7 +66,7 @@ edits.
 |---|---|
 | What this is | The public, crawlable side of Remy Sport: landing page, pages for organisers, coaches and parents, the blog, and event and organisation pages rendered from the app's public API |
 | What it is not | A second app. Nobody signs in here except editors. Accounts, teams, players, games and live video stay in the app |
-| Platform | Cloudflare (Workers, D1, R2), on the free plan to start |
+| Platform | Cloudflare (Workers, D1, R2) |
 | Started from | EmDash's `blog-cloudflare` template; `site/` is ours from here on |
 | Name | "Remy Sport" is the working title. Keep the name in the site settings and the seed — never hardcode it in a page — so a rebrand is one edit |
 | Privacy line | Only events and organisations are shown. Nothing that names a person — above all a child — is ever rendered here, whatever the app's API will hand over |
@@ -284,7 +313,7 @@ page. Both need a deployed, public address.
 
 ## Not decided yet
 
-- **The domain.** The site is built and reviewed on Cloudflare's default address. Pick the real one
+- **The domain.** The site is deployed on Cloudflare's default address (see Deployed). Pick the real one
   before editors are invited: sign-in is tied to the domain it was set up on.
 
 ## Where the thinking is
