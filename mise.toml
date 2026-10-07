@@ -29,4 +29,4 @@ PLUGIN_SECURITY_EMAIL = ""
 
 [task_config]
 # Pinned to a release of emdash-run. To update, change the tag.
-includes = ["git::https://github.com/joeblew999/emdash-run.git//tasks.toml?ref=v1.0.0"]
+includes = ["git::https://github.com/joeblew999/emdash-run.git//tasks.toml?ref=v1.0.1"]
