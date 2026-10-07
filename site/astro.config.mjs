@@ -6,11 +6,11 @@ import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import emdash from "emdash/astro";
 
 // The site's public address. The real domain is undecided, so it is a setting, not a constant:
-// CANONICAL_URL, else the harness's DEPLOY_URL (mise.toml), else this machine. `astro dev` always
+// CANONICAL_URL, else LIVE_URL (mise.toml), else this machine. `astro dev` always
 // uses this machine, so setting either for a deploy never breaks local sign-in.
 const isDev = process.argv.includes("dev");
 const localUrl = `http://localhost:${process.env.SITE_PORT || 4321}`;
-const publicUrl = (!isDev && (process.env.CANONICAL_URL || process.env.DEPLOY_URL)) || "";
+const publicUrl = (!isDev && (process.env.CANONICAL_URL || process.env.LIVE_URL)) || "";
 const site = publicUrl || localUrl;
 
 // THE LANGUAGES. This is the one list: Astro and EmDash are both configured from it, and the

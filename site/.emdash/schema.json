@@ -1,0 +1,100 @@
+{
+  "collections": [
+    {
+      "slug": "pages",
+      "label": "Pages",
+      "labelSingular": "Page",
+      "supports": [
+        "drafts",
+        "revisions",
+        "preview",
+        "search",
+        "seo"
+      ],
+      "hidden": false,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "summary",
+          "label": "Summary",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "placeholder",
+          "label": "Placeholder (shows a draft banner and keeps search engines away; untick when the text is final)",
+          "type": "boolean",
+          "required": false,
+          "unique": false,
+          "defaultValue": false
+        }
+      ]
+    },
+    {
+      "slug": "posts",
+      "label": "Posts",
+      "labelSingular": "Post",
+      "supports": [
+        "drafts",
+        "revisions",
+        "preview",
+        "scheduling",
+        "search",
+        "seo"
+      ],
+      "hidden": false,
+      "fields": [
+        {
+          "slug": "title",
+          "label": "Title",
+          "type": "string",
+          "required": true,
+          "unique": false
+        },
+        {
+          "slug": "excerpt",
+          "label": "Excerpt",
+          "type": "text",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "featured_image",
+          "label": "Cover image",
+          "type": "image",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "content",
+          "label": "Content",
+          "type": "portableText",
+          "required": false,
+          "unique": false
+        },
+        {
+          "slug": "angle",
+          "label": "Angle (editors only: the one point this post makes)",
+          "type": "string",
+          "required": false,
+          "unique": false
+        }
+      ]
+    }
+  ],
+  "version": "10334d02a308fb0e"
+}

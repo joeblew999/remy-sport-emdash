@@ -12,3 +12,6 @@ data.db
 !.env.example
 .dev.vars
 .dev.vars.*
+
+# content:pull writes packages here; they hold drafts
+backups

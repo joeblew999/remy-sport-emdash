@@ -2,8 +2,8 @@
 
 The public site for **Remy Sport** — the pages a person or a search engine can read without
 signing in: what it is, who it is for, the blog, and a page for every event and organisation. Built on
-[EmDash](https://docs.emdashcms.com) with the [emdash-run](https://github.com/joeblew999/emdash-run)
-harness.
+[EmDash](https://docs.emdashcms.com), on 1.2.0. Its `mise` tasks come from
+[emdash-run](https://github.com/joeblew999/emdash-run) by one include line in `mise.toml`.
 
 The Remy Sport **app** is a separate repo and a separate deployment. It stays the place where
 people sign in and do things. This site is how they find it.
@@ -13,15 +13,21 @@ people sign in and do things. This site is how they find it.
 You need [mise](https://mise.jdx.dev) and git.
 
 ```
-mise trust --all
-mise run setup       first time on a machine: install and bring the site up
-mise run open        the admin, signed in
-mise run status      what is running, and on what
-mise run check       before a commit — the git hook runs it
+mise trust
+mise run site:start    install, and run the site in the background
+mise run site:logs     follow its log
+mise run site:stop
+mise run site:check    before a commit: the seed, the types, the build
+mise run model:sync    after a model change in the admin: record it in site/.emdash/
+mise run emdash -- content list posts    anything else, through EmDash's CLI
 ```
 
+The admin, signed in: `http://localhost:<SITE_PORT>/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin`
+(the port is 4321 unless `SITE_PORT` in `mise.toml` or `mise.local.toml` says otherwise).
+`mise tasks ls` lists every task.
+
 Build the site in `site/` — pages, layouts, components, the seed. The dev server reloads your
-edits. Run `mise run dev` after changing `mise.toml`, the seed, or a plugin.
+edits.
 
 ## What is decided
 
@@ -59,7 +65,7 @@ the seed). An unset title shows the host name, so a missing setting is obvious.
 
 | setting | where | what |
 |---|---|---|
-| `CANONICAL_URL`, else `DEPLOY_URL` | the environment of the build (`DEPLOY_URL` is in `mise.toml`) | The site's public address: `site:` in `astro.config.mjs`. Canonical links, the sitemap, `robots.txt`, RSS and share tags are all built from it, never from the host that answered. Unset, it is this machine. `astro dev` always uses this machine |
+| `CANONICAL_URL`, else `LIVE_URL` | the environment of the build (`LIVE_URL` is in `mise.toml`) | The site's public address: `site:` in `astro.config.mjs`. Canonical links, the sitemap, `robots.txt`, RSS and share tags are all built from it, never from the host that answered. Unset, it is this machine. `astro dev` always uses this machine |
 | `APP_ORIGIN`, `HELP_ORIGIN` | `vars` in `site/wrangler.jsonc` | Where "Open the app" and "Help" go |
 | `APP_API_ORIGIN` | `site/.dev.vars` (gitignored), or `vars` | Which app the site reads: its events and organisations come from `<APP_API_ORIGIN>/api`. Defaults to `APP_ORIGIN`, which defaults to production. Point a local or preview site at the app's staging twin, which holds fixtures only |
 | `APP_DATA_IS_REAL` | `vars` in `site/wrangler.jsonc` | `"false"` today. The app's events are test entries: invented events under real schools' names. Until this is `"true"`, every event and organisation page shows a "Sample data" notice, carries `noindex`, and is left out of the sitemap. Set it to `"true"` when the app this site reads holds real events |
@@ -221,7 +227,7 @@ schema.org `SportsEvent` or `Organization` block with only the properties the ap
 sport, status, image, price or performer: the app has none), and one button into the app:
 `<APP_ORIGIN>/#/event/<id>?ref=site-event` or `#/org/<id>?ref=site-organisation`.
 
-**Prove it.** With the site running (`mise run status` prints the address; 4321 unless
+**Prove it.** With the site running (`mise run site:start` prints the address; 4321 unless
 `SITE_PORT` says otherwise). No browser, no JavaScript:
 
 ```
@@ -281,6 +287,6 @@ page. Both need a deployed, public address.
 
 ## Where the thinking is
 
-In the harness repo, under `docs/`: `remy-sport.md` (what Remy Sport is and what its site needs),
+In the emdash-run repo, under `docs/`: `remy-sport.md` (what Remy Sport is and what its site needs),
 `plans/2026-10-06-our-site.md` (the plan for this site), and `remy-sport-app-and-site.md` (how the
 app and this site can use each other). Every factual statement on the site comes from those.
