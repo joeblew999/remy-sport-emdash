@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "my-emdash-site",
+	"name": "remy-sport-site",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": ["nodejs_compat"],
@@ -13,17 +13,22 @@
 		// pages carry a "sample data" notice and noindex, and stay out of the sitemap: the app's
 		// test entries are invented events under real schools' names.
 		"APP_DATA_IS_REAL": "false",
+		// Cloudflare Access is in front of /_emdash (mise run signin:access made the application and
+		// printed this). EmDash checks every admin and API request carries a pass made for it.
+		"CF_ACCESS_AUDIENCE": "01936c6945e68b8c207c3cd509ef52c52799de4c7df33f98d91fd8d9ca0fec5a",
 	},
+	// No per-version preview addresses: they would be a second way in, with no Access in front.
+	"preview_urls": false,
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "my-emdash-site",
+			"database_name": "remy-sport-site",
 		},
 	],
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
-			"bucket_name": "my-emdash-media",
+			"bucket_name": "remy-sport-site-media",
 		},
 	],
 	// Sandboxed plugins require Worker Loader, available on Workers paid plans. Uncomment to enable:

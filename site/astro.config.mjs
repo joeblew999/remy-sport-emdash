@@ -1,6 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { d1, r2 } from "@emdash-cms/cloudflare";
+import { access, d1, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig, fontProviders } from "astro/config";
 import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import emdash from "emdash/astro";
@@ -56,6 +56,11 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
+			// Sign-in on the deployed site is Cloudflare Access, in front of /_emdash: people by a code
+			// sent to their address, machines by a service token (mise run signin:access set both up
+			// and printed this line). The audience is CF_ACCESS_AUDIENCE in wrangler.jsonc. The dev
+			// site (site:start) still signs you in by itself.
+			auth: access({ teamDomain: "gedw99.cloudflareaccess.com", audienceEnvVar: "CF_ACCESS_AUDIENCE" }),
 		}),
 	],
 	fonts: [

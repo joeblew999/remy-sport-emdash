@@ -15,9 +15,9 @@ pnpm = "12"
 fnox = "1.36.0"   # keeps the Cloudflare token signin:access needs
 
 [env]
-# The deployed site's address — empty until there is a deployment. astro.config.mjs uses it as the
-# site's public address in a build; content:pull and the live: tasks need it.
-LIVE_URL = ""
+# The deployed site's address. astro.config.mjs uses it as the site's public address in a build;
+# content:pull, signin:access and the live: tasks need it.
+LIVE_URL = "https://remy-sport-site.gedw99.workers.dev"
 # Who may sign in to the deployed site (signin:access, signin:token -- --live).
 ADMIN_EMAIL = ""
 
