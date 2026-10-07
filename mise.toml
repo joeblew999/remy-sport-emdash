@@ -2,6 +2,7 @@
 #
 #   mise run site:start   work on the site      mise run site:check   before a commit
 #   mise run site:stop                          mise run model:sync   after a model change in the admin
+#   mise run live:ship    deploy it             add -- --live to act on the deployed site
 #
 # All of them: mise tasks ls. What each does: https://github.com/joeblew999/emdash-run
 
@@ -11,11 +12,14 @@ experimental = true
 [tools]
 node = "26"
 pnpm = "12"
+fnox = "1.36.0"   # keeps the Cloudflare token signin:access needs
 
 [env]
 # The deployed site's address — empty until there is a deployment. astro.config.mjs uses it as the
 # site's public address in a build; content:pull and the live: tasks need it.
 LIVE_URL = ""
+# Who may sign in to the deployed site (signin:access, signin:token -- --live).
+ADMIN_EMAIL = ""
 
 # Who a plugin made with plugin:new says it is from. The publisher must be a real Atmosphere
 # handle or DID before a plugin can be made.
@@ -25,4 +29,4 @@ PLUGIN_SECURITY_EMAIL = ""
 
 [task_config]
 # Pinned to a release of emdash-run. To update, change the tag.
-includes = ["git::https://github.com/joeblew999/emdash-run.git//tasks.toml?ref=v0.7.0"]
+includes = ["git::https://github.com/joeblew999/emdash-run.git//tasks.toml?ref=v1.0.0"]

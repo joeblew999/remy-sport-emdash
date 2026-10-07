@@ -24,7 +24,9 @@ mise run emdash -- content list posts    anything else, through EmDash's CLI
 
 The admin, signed in: `http://localhost:<SITE_PORT>/_emdash/api/setup/dev-bypass?redirect=/_emdash/admin`
 (the port is 4321 unless `SITE_PORT` in `mise.toml` or `mise.local.toml` says otherwise).
-`mise tasks ls` lists every task.
+`mise tasks ls` lists every task. Deploying and signing in to the deployed site are in
+[emdash-run's README](https://github.com/joeblew999/emdash-run#readme): `live:ship`, `signin:access`,
+`signin:token -- --live`, and `-- --live` on any task to act on the deployed site.
 
 Build the site in `site/` — pages, layouts, components, the seed. The dev server reloads your
 edits.
