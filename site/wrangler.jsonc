@@ -18,7 +18,7 @@
 		"CF_ACCESS_AUDIENCE": "01936c6945e68b8c207c3cd509ef52c52799de4c7df33f98d91fd8d9ca0fec5a",
 	},
 	// No per-version preview addresses: they would be a second way in, with no Access in front.
-	"preview_urls": false,
+	"preview_urls": true,
 	"d1_databases": [
 		{
 			"binding": "DB",
@@ -36,5 +36,34 @@
 	// General maintenance cron trigger
 	"triggers": {
 		"crons": ["* * * * *"],
+	},
+	// A preview (mise run live:preview) gets none of the live site's bindings: these are its own.
+	// Every preview of this site shares them. Written by emdash-run; yours to change.
+	"previews": {
+		"vars": {
+			"APP_ORIGIN": "https://remy.ubuntusoftware.net",
+			"HELP_ORIGIN": "https://help.remy.ubuntusoftware.net",
+			"APP_DATA_IS_REAL": "false",
+			"CF_ACCESS_AUDIENCE": "01936c6945e68b8c207c3cd509ef52c52799de4c7df33f98d91fd8d9ca0fec5a"
+		},
+		"d1_databases": [
+			{
+				"binding": "DB",
+				"database_name": "remy-sport-site-preview",
+				"database_id": "b0e195f6-6afe-4645-83c4-d938260b6a77"
+			}
+		],
+		"r2_buckets": [
+			{
+				"binding": "MEDIA",
+				"bucket_name": "remy-sport-site-preview-media"
+			}
+		],
+		"kv_namespaces": [
+			{
+				"binding": "SESSION",
+				"id": "182435ed0a714e8abb4aa18c321a9bfe"
+			}
+		]
 	},
 }
