@@ -4,6 +4,7 @@ import { access, d1, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig, fontProviders } from "astro/config";
 import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import emdash from "emdash/astro";
+import { sandbox } from "@emdash-cms/cloudflare";
 
 // The site's public address. The real domain is undecided, so it is a setting, not a constant:
 // CANONICAL_URL, else LIVE_URL (mise.toml), else this machine. `astro dev` always
@@ -54,6 +55,7 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
+			sandboxRunner: sandbox(),
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
 			// Sign-in on the deployed site is Cloudflare Access, in front of /_emdash: people by a code
