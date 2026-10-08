@@ -1,10 +1,9 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { access, d1, r2 } from "@emdash-cms/cloudflare";
+import { access, d1, r2, sandbox } from "@emdash-cms/cloudflare";
 import { defineConfig, fontProviders } from "astro/config";
 import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import emdash from "emdash/astro";
-import { sandbox } from "@emdash-cms/cloudflare";
 
 // The site's public address. The real domain is undecided, so it is a setting, not a constant:
 // CANONICAL_URL, else LIVE_URL (mise.toml), else this machine. `astro dev` always
