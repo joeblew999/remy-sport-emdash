@@ -4,8 +4,10 @@ import { access, d1, r2, sandbox } from "@emdash-cms/cloudflare";
 import { defineConfig, fontProviders } from "astro/config";
 import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import emdash from "emdash/astro";
+import { coywolfPlugin } from "@coywolf/emdash";
 
-// The site's public address. The real domain is undecided, so it is a setting, not a constant:
+// The site's public address, www.remy.ubuntusoftware.net. It is a setting, not a constant, so a
+// rebrand or a preview is one edit:
 // CANONICAL_URL, else LIVE_URL (mise.toml), else this machine. `astro dev` always
 // uses this machine, so setting either for a deploy never breaks local sign-in.
 const isDev = process.argv.includes("dev");
@@ -30,6 +32,10 @@ const fallback = /** @type {any} */ (
 );
 
 export default defineConfig({
+	vite: {
+		optimizeDeps: { exclude: ["@coywolf/emdash"], include: ["@phosphor-icons/react", "@cloudflare/kumo"] },
+		ssr: { optimizeDeps: { exclude: ["@coywolf/emdash"] } },
+	},
 	site,
 	output: "server",
 	adapter: cloudflare(),
@@ -54,6 +60,7 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
+			plugins: [coywolfPlugin()],
 			sandboxRunner: sandbox(),
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),

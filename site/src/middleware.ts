@@ -3,5 +3,10 @@
 // So there is nothing to do on the way in or out.
 
 import type { MiddlewareHandler } from "astro";
+import { sequence } from "astro:middleware";
+import { coywolfPack } from "@coywolf/emdash/middleware";
 
-export const onRequest: MiddlewareHandler = (_context, next) => next();
+const siteMiddleware: MiddlewareHandler = (_context, next) => next();
+
+// Coywolf Pack's middleware first (mise run plugin:coywolf), then the site's own.
+export const onRequest = sequence(coywolfPack(), siteMiddleware);

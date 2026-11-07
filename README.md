@@ -29,9 +29,11 @@ The admin, signed in: `http://localhost:<SITE_PORT>/_emdash/api/setup/dev-bypass
 
 ## Deployed
 
-`https://remy-sport-site.gedw99.workers.dev` — Cloudflare's default address, until the domain is
-decided. The Worker and its D1 database are `remy-sport-site`; the R2 bucket is
-`remy-sport-site-media`. The address is `LIVE_URL` in `mise.toml`.
+`https://www.remy.ubuntusoftware.net` — the Worker's custom domain (`routes` in `site/wrangler.jsonc`),
+in the `ubuntusoftware.net` zone beside the app (`remy.`) and the help site (`help.remy.`). It is the
+Worker's only address: the workers.dev one is off (`workers_dev: false`; why is beside it). The
+Worker and its D1 database are `remy-sport-site`; the R2 bucket is `remy-sport-site-media`. The
+address is `LIVE_URL` in `mise.toml`.
 
 ```
 mise run live:ship                       check, build, deploy, wait for it to answer
@@ -66,7 +68,8 @@ edits.
 |---|---|
 | What this is | The public, crawlable side of Remy Sport: landing page, pages for organisers, coaches and parents, the blog, and event and organisation pages rendered from the app's public API |
 | What it is not | A second app. Nobody signs in here except editors. Accounts, teams, players, games and live video stay in the app |
-| Platform | Cloudflare (Workers, D1, R2) |
+| Platform | Cloudflare (Workers, D1, R2), Workers Paid |
+| Address | `www.remy.ubuntusoftware.net`, public |
 | Started from | EmDash's `blog-cloudflare` template; `site/` is ours from here on |
 | Name | "Remy Sport" is the working title. Keep the name in the site settings and the seed — never hardcode it in a page — so a rebrand is one edit |
 | Privacy line | Only events and organisations are shown. Nothing that names a person — above all a child — is ever rendered here, whatever the app's API will hand over |
@@ -164,6 +167,19 @@ It is not installed, and the check was not worked around. Two things have to be 
   (Settings → SEO → default image) when there is artwork; a post's cover image is used for that post.
 - The edge cache: `cacheCloudflare()` in the config. A page is fresh for five minutes, may be served
   stale for a day while it is refreshed, and is purged by tag when what it shows is published.
+- [Coywolf Pack](https://github.com/coywolf-llc/coywolf-pack) (`@coywolf/emdash`), put in by
+  `mise run plugin:coywolf`: the plugin in `astro.config.mjs`, its middleware first in
+  `src/middleware.ts`, and in `wrangler.jsonc` the bindings it needs (`CF_VERSION_METADATA`, `SELF`),
+  Smart Placement and Workers Logs. Every module starts off. Turned on in the admin
+  (Plugins → Coywolf Pack → Features), its page cache keeps a page at the edge for days instead of
+  minutes, clears it on a deploy or an edit, and warms the site's pages again afterwards, so a
+  visitor or a crawler is not the one who waits for a cold Worker and D1.
+- Astro is held to 7.3.x (`~7.3.5`) and its Cloudflare adapter to 14.3.x: with Astro 7.4.7,
+  `astro check` would not load `@astrojs/check` (seen 2026-11-07 on Linux; an `@emnapi/runtime`
+  crash), so `site:check` fails. wrangler is at 4.158 or newer: with 4.147 every write to the built
+  site on this machine answered 500 (`cache.purge is not a function`), the route cache's purge.
+- The zone: `mise run live:zone` — Smart Tiered Cache, Early Hints, and two rules for this host
+  only (a challenge to scrapers posing as old browsers, a block of WordPress probes).
   `public/_headers` caches built assets for a year. The 404 page is never cached.
 - Placeholder pages (privacy, terms) carry a visible draft banner and `noindex`, and are left out of
   the sitemap, until an editor unticks "Placeholder".
@@ -310,11 +326,6 @@ page. Both need a deployed, public address.
   the events are real. When they are, set `APP_DATA_IS_REAL` to `"true"` (above).
 - A share image and a favicon (Settings in the admin).
 - Whether posts carry a named author. None is seeded: the site names no person until that is decided.
-
-## Not decided yet
-
-- **The domain.** The site is deployed on Cloudflare's default address (see Deployed). Pick the real one
-  before editors are invited: sign-in is tied to the domain it was set up on.
 
 ## Where the thinking is
 
