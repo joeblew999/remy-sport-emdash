@@ -4,6 +4,13 @@
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-02-24",
 	"compatibility_flags": ["nodejs_compat"],
+	// The site's own address (LIVE_URL in mise.toml). Cloudflare makes its DNS record and certificate.
+	"routes": [{ "pattern": "www.remy.ubuntusoftware.net", "custom_domain": true }],
+	// And no other. The cache in front of the Worker is keyed by path, not host, and robots.txt is not
+	// the same on every host (src/pages/robots.txt.ts disallows everything on a host that is not the
+	// public address): a crawler asking the workers.dev address would put that answer in the cache
+	// for www as well. Previews keep their own addresses (preview_urls, below).
+	"workers_dev": false,
 	// Where this site sends people, and which app it reads. Read in src/lib/app.ts and nowhere
 	// else. A local `.dev.vars` (gitignored) can set APP_API_ORIGIN to the app's staging twin.
 	"vars": {
@@ -67,4 +74,12 @@
 			}
 		]
 	},
+	// a deploy clears the page cache; the usage card finds this Worker (Coywolf Pack)
+	"version_metadata": { "binding": "CF_VERSION_METADATA" },
+	// cache warming and internal link checks call the Worker itself (Coywolf Pack)
+	"services": [{ "binding": "SELF", "service": "remy-sport-site" }],
+	// Smart Placement: the Worker runs near its database (Coywolf Pack)
+	"placement": { "mode": "smart" },
+	// Workers Logs: the usage card's estimate of what warming costs (Coywolf Pack)
+	"observability": { "enabled": true },
 }

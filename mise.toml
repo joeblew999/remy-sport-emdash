@@ -17,7 +17,7 @@ fnox = "1.36.0"   # keeps the Cloudflare token signin:access needs
 [env]
 # The deployed site's address. astro.config.mjs uses it as the site's public address in a build;
 # content:pull, signin:access and the live: tasks need it.
-LIVE_URL = "https://remy-sport-site.gedw99.workers.dev"
+LIVE_URL = "https://www.remy.ubuntusoftware.net"
 # Who may sign in to the deployed site (signin:access, signin:token -- --live).
 ADMIN_EMAIL = ""
 
@@ -28,5 +28,6 @@ PLUGIN_AUTHOR = "joeblew999"
 PLUGIN_SECURITY_EMAIL = ""
 
 [task_config]
-# Pinned to a release of emdash-run. To update, change the tag.
-includes = ["git::https://github.com/joeblew999/emdash-run.git//tasks.toml?ref=v1.1.0"]
+# Pinned to emdash-run's merge of plugin:coywolf (joeblew999/emdash-run#8): a commit, until it is tagged
+# v2.1.0 (this session could not push tags). To update, change the ref.
+includes = ["git::https://github.com/joeblew999/emdash-run.git//tasks.toml?ref=a3fbd8f326c3aab31a5556877c4e09b68eab8d5a"]
